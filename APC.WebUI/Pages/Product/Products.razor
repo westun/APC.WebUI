@@ -1,4 +1,4 @@
-﻿@page "/counter"
+﻿@page "/products"
 
 @{
     string cardButtonText = "View More";
@@ -11,7 +11,7 @@
 <div class="row">
     <div class="col-sm-3">
         <div class="card" style="width: 14rem;">
-            <img src="~/img/Bathtissue-profile-small-dec14-3-246x246.png" class="card-img-top" alt="...">
+            <img src="img/Bathtissue-profile-small-dec14-3-246x246.png" class="card-img-top" alt="...">
             <div class="card-body text-center">
                 <h5 class="card-title">Bath Tissue</h5>
                 <p class="card-text">Quality, Flexibility, <br /> Consistency, Reliability</p>
@@ -21,7 +21,7 @@
     </div>
     <div class="col-sm-3">
         <div class="card" style="width: 14rem;">
-            <img src="~/img/hwt-profile-small-dec14-2-246x246.png" class="card-img-top" alt="...">
+            <img src="img/hwt-profile-small-dec14-2-246x246.png" class="card-img-top" alt="...">
             <div class="card-body text-center">
                 <h5 class="card-title">Roll Towel & Multifold</h5>
                 <p class="card-text">High Capacity, Environmentally Friendly and Superior Quality</p>
@@ -31,7 +31,7 @@
     </div>
     <div class="col-sm-3">
         <div class="card" style="width: 14rem;">
-            <img src="~/img/facial-profile-small-dec14-246x246.png" class="card-img-top" alt="...">
+            <img src="img/facial-profile-small-dec14-246x246.png" class="card-img-top" alt="...">
             <div class="card-body text-center">
                 <h5 class="card-title">Facial Tissue</h5>
                 <p class="card-text">For Every Sneeze, There is a Tissue</p>
@@ -41,7 +41,7 @@
     </div>
     <div class="col-sm-3">
         <div class="card" style="width: 14rem;">
-            <img src="~/img/A245_profile_small-dec14-7-1-246x246.png" class="card-img-top" alt="...">
+            <img src="img/A245_profile_small-dec14-7-1-246x246.png" class="card-img-top" alt="...">
             <div class="card-body text-center">
                 <h5 class="card-title">Dispensers</h5>
                 <p class="card-text">Innovative Solutions</p>
@@ -52,7 +52,7 @@
 </div>
 
 <div class="text-center mt-3">
-    <a class="btn btn-primary" asp-area="" asp-controller="products" asp-action="browse">View All Products</a>
+    <a class="btn btn-primary" href="products/browse">View All Products</a>
 </div>
 
 @code {
