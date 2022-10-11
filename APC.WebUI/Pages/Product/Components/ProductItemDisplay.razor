@@ -1,0 +1,14 @@
+﻿
+<div class="card" style="width: 14rem;">
+    <img src="@Product.ImageUrl" class="card-img-top" alt="...">
+    <div class="card-body text-center">
+        <h5 class="card-title">@Product.Name</h5>
+        <p class="card-text"></p>
+        <a href="#" class="btn btn-primary">Add to Cart</a>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public APC.DAL.Models.Product Product { get; set; }
+}

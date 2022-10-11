@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APC.WebUI", "APC.WebUI\APC.WebUI.csproj", "{82859A57-9B63-41CC-9CCB-C68E23ED5C9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APC.DAL", "APC.DAL\APC.DAL.csproj", "{2739CDC6-DF0C-462A-B97A-C41F30B7BFF8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APC.DAL", "APC.DAL\APC.DAL.csproj", "{2739CDC6-DF0C-462A-B97A-C41F30B7BFF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

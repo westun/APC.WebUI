@@ -5,13 +5,32 @@
 
 <h1>Browse Products</h1>
 
-<button @onclick="@initDBContext">Init DB conext</button>
+@if (Products is null)
+{
+    <div>Loading...</div>
+}
+else
+{
+    @foreach (var product in Products)
+    {
+        <div class="row">
+            <div class="col-sm-3">
+                <ProductItemDisplay Product="product"></ProductItemDisplay>
+            </div>
+        </div>
+    }
+}
+
+<button class="btn btn-primary" @onclick="@ViewProducts">
+    Init DB conext
+</button>
 
 @code {
+    private IEnumerable<APC.DAL.Models.Product> Products = new List<APC.DAL.Models.Product>();
 
-    private void initDBContext()
+    private void ViewProducts()
     {
         using var dbContext = DbFactory.CreateDbContext();
-        var products = dbContext.Products.ToList();
+        this.Products = dbContext.Products.ToList();
     }
 }
