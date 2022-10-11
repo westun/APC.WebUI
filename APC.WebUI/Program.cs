@@ -1,6 +1,5 @@
 using APC.DAL.DataAccess;
 using APC.DAL.Repositories;
-using APC.WebUI.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
@@ -35,7 +34,6 @@ namespace APC.WebUI
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor()
                 .AddMicrosoftIdentityConsentHandler();
-            builder.Services.AddSingleton<WeatherForecastService>();
 
             builder.Services.AddDbContextFactory<APCContext>(options =>
                 options.UseSqlServer("server=localhost;Initial Catalog=APC;Integrated Security=true;"));
