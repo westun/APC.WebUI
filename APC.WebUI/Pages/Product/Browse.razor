@@ -5,32 +5,38 @@
 
 <h1>Browse Products</h1>
 
-@if (Products is null)
+@if (Products is null || !Products.Any())
 {
+    <div>
+        <button class="btn btn-primary" @onclick="@LoadProductsFromDB">
+            View Products
+        </button>
+    </div>
     <div>Loading...</div>
 }
 else
 {
-    @foreach (var product in Products)
-    {
-        <div class="row">
-            <div class="col-sm-3">
+    <div class="row">
+        @foreach (var product in Products)
+        {
+            <div class="col-sm-4 mb-3">
                 <ProductItemDisplay Product="product"></ProductItemDisplay>
             </div>
-        </div>
-    }
+        }
+    </div>
 }
-
-<button class="btn btn-primary" @onclick="@ViewProducts">
-    Init DB conext
-</button>
 
 @code {
     private IEnumerable<APC.DAL.Models.Product> Products = new List<APC.DAL.Models.Product>();
 
-    private void ViewProducts()
+    private void LoadProductsFromDB()
     {
         using var dbContext = DbFactory.CreateDbContext();
-        this.Products = dbContext.Products.ToList();
+        this.Products = dbContext.Products
+            .Include(p => p.Category)
+            .Include(p => p.Type)
+            .OrderBy(p => p.Type.Name)
+            .ThenBy(p => p.Name)
+            .ToList();
     }
 }
