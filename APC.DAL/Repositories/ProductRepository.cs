@@ -19,6 +19,15 @@ namespace APC.DAL.Repositories
             this.dbContextFactory = dbContextFactory;
         }
 
+        public async Task<Product> GetAsync(int id)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            return await dbContext.Products
+                .Include(p => p.Category)
+                .Include(p => p.Type)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
         public async Task<IEnumerable<Product>> GetAsync()
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
