@@ -1,3 +1,4 @@
+using APC.DAL.DataAccess;
 using APC.WebUI.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Logging;
@@ -33,6 +35,15 @@ namespace APC.WebUI
             builder.Services.AddServerSideBlazor()
                 .AddMicrosoftIdentityConsentHandler();
             builder.Services.AddSingleton<WeatherForecastService>();
+
+            builder.Services.AddDbContextFactory<APCContext>(options =>
+                options.UseSqlServer("server=localhost;Initial Catalog=APC;Integrated Security=true;"));
+
+            //scoped service isn't ideal for blazor apps
+            //builder.Services.AddDbContext<APCContext>(options =>
+            //{
+            //    options.UseSqlServer();
+            //});
 
             var app = builder.Build();
 

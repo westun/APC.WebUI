@@ -1,9 +1,17 @@
 ﻿@page "/products/browse"
+@inject IDbContextFactory<APCContext> DbFactory
 
 <PageTitle>Browse products</PageTitle>
 
 <h1>Browse Products</h1>
 
+<button @onclick="@initDBContext">Init DB conext</button>
+
 @code {
 
+    private void initDBContext()
+    {
+        using var dbContext = DbFactory.CreateDbContext();
+        var products = dbContext.Products.ToList();
+    }
 }
