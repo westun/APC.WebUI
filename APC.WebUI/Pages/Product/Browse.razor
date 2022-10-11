@@ -1,5 +1,5 @@
 ﻿@page "/products/browse"
-@inject IDbContextFactory<APCContext> DbFactory
+@inject ProductRepository productRepository
 
 <PageTitle>Browse products</PageTitle>
 
@@ -24,21 +24,15 @@ else
 @code {
     private IEnumerable<APC.DAL.Models.Product> Products = new List<APC.DAL.Models.Product>();
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        LoadProductsFromDB();
+        await LoadProductsFromDB();
 
-        return base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 
-    private void LoadProductsFromDB()
+    private async Task LoadProductsFromDB()
     {
-        using var dbContext = DbFactory.CreateDbContext();
-        this.Products = dbContext.Products
-            .Include(p => p.Category)
-            .Include(p => p.Type)
-            .OrderBy(p => p.Type.Name)
-            .ThenBy(p => p.Name)
-            .ToList();
+        this.Products = await productRepository.GetAsync();
     }
 }

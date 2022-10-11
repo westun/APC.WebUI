@@ -1,4 +1,5 @@
 using APC.DAL.DataAccess;
+using APC.DAL.Repositories;
 using APC.WebUI.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -44,6 +45,8 @@ namespace APC.WebUI
             //{
             //    options.UseSqlServer();
             //});
+
+            builder.Services.AddTransient<ProductRepository>();
 
             var app = builder.Build();
 
