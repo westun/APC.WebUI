@@ -7,11 +7,6 @@
 
 @if (Products is null || !Products.Any())
 {
-    <div>
-        <button class="btn btn-primary" @onclick="@LoadProductsFromDB">
-            View Products
-        </button>
-    </div>
     <div>Loading...</div>
 }
 else
@@ -28,6 +23,13 @@ else
 
 @code {
     private IEnumerable<APC.DAL.Models.Product> Products = new List<APC.DAL.Models.Product>();
+
+    protected override Task OnInitializedAsync()
+    {
+        LoadProductsFromDB();
+
+        return base.OnInitializedAsync();
+    }
 
     private void LoadProductsFromDB()
     {
