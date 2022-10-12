@@ -12,6 +12,36 @@ namespace APC.WebUI.Services
             this.productRepository = productRepository;
         }
 
+        public async Task<ProductDTO> GetProductByIdAsync(int id)
+        {
+            var product = await this.productRepository.GetAsync(id);
+
+            return new ProductDTO
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                ImageUrl = product.ImageUrl,
+                Category = new ProductCategoryDTO
+                {
+                    Name = product.Category.Name,
+                },
+                Type = new ProductTypeDTO
+                {
+                    Name = product.Type.Name,
+                },
+                AttributeValues = product.ProductAttributesValues.Select(pav => new ProductAttributeValueDTO()
+                {
+                    Value = pav.Value,
+                    DisplayOrder = pav.DisplayOrder,
+                    Attribute = new ProductAttributeDTO
+                    {
+                        Name = pav.ProductAttribute.Name,
+                    }
+                }),
+            };
+        }
+
         public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync()
         {
             var products = await this.productRepository.GetAsync();

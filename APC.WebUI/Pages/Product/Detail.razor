@@ -1,11 +1,44 @@
 ﻿@page "/products/browse/detail"
 @page "/products/browse/detail/{id:int}"
+@inject IProductService productService
 
 <h1>Product Detail</h1>
 
-
+@if (Product is null)
+{
+    <div><em>Loading...</em></div>
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-5">
+            <img src="@Product.ImageUrl">
+        </div>
+        <div class="col-sm-7">
+            <h2>@Product.Name</h2>
+            <ul>
+                @foreach (var attributeValue in Product.AttributeValues)
+                {
+                    <li>
+                        <strong>@attributeValue.Attribute.Name:</strong> @attributeValue.Value
+                    </li>
+                }
+            </ul>
+            <button href="#" class="btn btn-primary btn-lg">Add to Cart</button>
+        </div>
+    </div>
+}
 
 @code {
     [Parameter]
     public int Id { get; set; }
+
+    public ProductDTO Product { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.Product = await productService.GetProductByIdAsync(this.Id);
+
+        await base.OnInitializedAsync();
+    }
 }
