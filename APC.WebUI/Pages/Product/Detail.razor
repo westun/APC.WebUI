@@ -10,29 +10,25 @@
 }
 else
 {
-    <div class="well p-3">
-        <div class="row mb-4">
-            <div class="col-sm-4">
-                <img src="@Product.ImageUrl">
-            </div>
-            <div class="col-sm-7">
-                <h2>@Product.Name</h2>
-                <div>
-                    @foreach (var attributeValue in Product.AttributeValues)
-                    {
-                        <p>
-                            <span class="oi oi-circle-check"></span> <strong>@attributeValue.Attribute.Name:</strong> @attributeValue.Value
-                        </p>
-                    }
-                </div>
-                <button href="#" class="btn btn-primary btn-lg">Add to Cart</button>
-            </div>
+    <div class="well p-3 mb-2 clearfix">
+        <div class="float-start">
+            <img src="@Product.ImageUrl">
         </div>
+        <div class="float-start ms-3">
+            <h2>@Product.Name</h2>
+            @foreach (var attributeValue in Product.AttributeValues)
+            {
+                <p>
+                    <span class="oi oi-circle-check"></span> <strong>@attributeValue.Attribute.Name:</strong> @attributeValue.Value
+                </p>
+            }
+            <button href="#" class="btn btn-primary btn-lg">Add to Cart</button>
+        </div>
+    </div>
 
-        <div class="row">
-            <h2>Areas of Application</h2>
-            <AreasOfApplicationDisplay AreasOfApplications="Product.AreasOfApplications"></AreasOfApplicationDisplay>
-        </div>
+    <div class="mb-5">
+        <h2>Areas of Application</h2>
+        <AreasOfApplicationDisplay AreasOfApplications="Product.AreasOfApplications"></AreasOfApplicationDisplay>
     </div>
 }
 
