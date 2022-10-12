@@ -27,6 +27,7 @@ namespace APC.DAL.Repositories
                 .Include(p => p.Type)
                 .Include(p => p.ProductAttributesValues)
                 .ThenInclude(pav => pav.ProductAttribute)
+                .Include(p => p.AreasOfApplications)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 

@@ -39,6 +39,10 @@ namespace APC.WebUI.Services
                         Name = pav.ProductAttribute.Name,
                     }
                 }),
+                AreasOfApplications = product.AreasOfApplications.Select(aoa => new AreasOfApplicationDTO
+                {
+                    Name = aoa.Name,
+                }),
             };
         }
 
@@ -59,16 +63,7 @@ namespace APC.WebUI.Services
                 Type = new ProductTypeDTO
                 {
                     Name = p.Type.Name,
-                },
-                AttributeValues = p.ProductAttributesValues.Select(pav => new ProductAttributeValueDTO()
-                {
-                    Value = pav.Value,
-                    DisplayOrder = pav.DisplayOrder,
-                    Attribute = new ProductAttributeDTO
-                    {
-                        Name = pav.ProductAttribute.Name,
-                    }
-                }),
+                }
             });
         }
     }

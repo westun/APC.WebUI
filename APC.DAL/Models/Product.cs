@@ -11,6 +11,8 @@ namespace APC.DAL.Models
         
         public ProductCategory Category { get; set; } = new ProductCategory();
         public ProductType Type { get; set; } = new ProductType();
-        public ICollection<ProductAttributeValue> ProductAttributesValues { get; set; } = new List<ProductAttributeValue>();    
+        public ICollection<ProductAttributeValue> ProductAttributesValues { get; set; } = new List<ProductAttributeValue>();
+        public ICollection<AreasOfApplication> AreasOfApplications { get; set; } = new List<AreasOfApplication>();
+
     }
 }

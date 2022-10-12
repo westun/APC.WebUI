@@ -27,6 +27,19 @@ else
             <button href="#" class="btn btn-primary btn-lg">Add to Cart</button>
         </div>
     </div>
+
+    <div class="row">
+        <h2>Areas of Application</h2>
+        <ul class="">
+            @foreach (var areaOfApplication in Product.AreasOfApplications)
+            {
+                <li class="d-inline me-3">
+                    <span class="oi oi-circle-check"></span>
+                    @areaOfApplication.Name
+                </li>
+            }
+        </ul>
+    </div>
 }
 
 @code {
