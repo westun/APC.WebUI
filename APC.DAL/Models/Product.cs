@@ -1,4 +1,6 @@
-﻿namespace APC.DAL.Models
+﻿using System.Net.Http.Headers;
+
+namespace APC.DAL.Models
 {
     public class Product
     {
@@ -9,5 +11,6 @@
         
         public ProductCategory Category { get; set; } = new ProductCategory();
         public ProductType Type { get; set; } = new ProductType();
+        public ICollection<ProductAttributeValue> ProductAttributesValues { get; set; } = new List<ProductAttributeValue>();    
     }
 }

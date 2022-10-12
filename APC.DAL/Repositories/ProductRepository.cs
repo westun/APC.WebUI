@@ -34,6 +34,8 @@ namespace APC.DAL.Repositories
             return await dbContext.Products
                 .Include(p => p.Category)
                 .Include(p => p.Type)
+                .Include(p => p.ProductAttributesValues)
+                .ThenInclude(pav => pav.ProductAttribute)
                 .OrderBy(p => p.Type.Name)
                 .ThenBy(p => p.Name)
                 .ToListAsync();

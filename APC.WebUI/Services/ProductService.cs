@@ -29,7 +29,16 @@ namespace APC.WebUI.Services
                 Type = new ProductTypeDTO
                 {
                     Name = p.Type.Name,
-                }
+                },
+                AttributeValues = p.ProductAttributesValues.Select(pav => new ProductAttributeValueDTO()
+                {
+                    Value = pav.Value,
+                    DisplayOrder = pav.DisplayOrder,
+                    Attribute = new ProductAttributeDTO
+                    {
+                        Name = pav.ProductAttribute.Name,
+                    }
+                }),
             });
         }
     }

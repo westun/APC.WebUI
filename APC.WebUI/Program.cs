@@ -45,8 +45,8 @@ namespace APC.WebUI
             //    options.UseSqlServer();
             //});
 
-            builder.Services.AddTransient<ProductRepository>();
-            builder.Services.AddTransient<ProductService>();
+            builder.Services.AddTransient<IProductRepository, ProductRepository>();
+            builder.Services.AddTransient<IProductService, ProductService>();
 
             var app = builder.Build();
 

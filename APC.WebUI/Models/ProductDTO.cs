@@ -9,5 +9,6 @@
 
         public ProductCategoryDTO Category { get; set; } = new ProductCategoryDTO();
         public ProductTypeDTO Type { get; set; } = new ProductTypeDTO();
+        public IEnumerable<ProductAttributeValueDTO> AttributeValues { get; set; } = new List<ProductAttributeValueDTO>();
     }
 }

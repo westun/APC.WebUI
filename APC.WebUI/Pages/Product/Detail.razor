@@ -1,5 +1,11 @@
-﻿<h1>Product Detail</h1>
+﻿@page "/products/browse/detail"
+@page "/products/browse/detail/{id:int}"
+
+<h1>Product Detail</h1>
+
+<div>Product Id: @Id</div>
 
 @code {
-
+    [Parameter]
+    public int Id { get; set; }
 }
