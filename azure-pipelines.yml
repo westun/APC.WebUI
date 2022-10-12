@@ -28,12 +28,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: $(System.DefaultWorkingDirectory)/APCWebApp
-    artifactName: APCWebApp
+    targetPath: $(System.DefaultWorkingDirectory)/
+    artifactName: WebApp
