@@ -1,5 +1,5 @@
 ﻿@page "/products/browse"
-@inject ProductRepository productRepository
+@inject ProductService productService
 
 <PageTitle>Browse products</PageTitle>
 
@@ -22,7 +22,7 @@ else
 }
 
 @code {
-    private IEnumerable<APC.DAL.Models.Product> Products = new List<APC.DAL.Models.Product>();
+    private IEnumerable<ProductDTO> Products = new List<ProductDTO>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,6 +33,6 @@ else
 
     private async Task LoadProductsFromDB()
     {
-        this.Products = await productRepository.GetAsync();
+        this.Products = await productService.GetAllProductsAsync();
     }
 }

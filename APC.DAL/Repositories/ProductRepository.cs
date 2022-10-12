@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace APC.DAL.Repositories
 {
-    public class ProductRepository
+    public class ProductRepository : IProductRepository
     {
         private readonly IDbContextFactory<APCContext> dbContextFactory;
 
