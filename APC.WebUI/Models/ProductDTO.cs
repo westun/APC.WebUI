@@ -1,9 +1,14 @@
-﻿namespace APC.WebUI.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace APC.WebUI.Models
 {
     public class ProductDTO
     {
         public int Id { get; set; }
+
+        [Required]
         public string Name { get; set; }
+
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
 

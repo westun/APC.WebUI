@@ -49,6 +49,8 @@ namespace APC.WebUI
             builder.Services.AddTransient<IProductService, ProductService>();
             builder.Services.AddTransient<IProductCategoryRepository, ProductCategoryRepository>();
             builder.Services.AddTransient<IProductCategoryService, ProductCategoryService>();
+            builder.Services.AddTransient<IProductTypeRepository, ProductTypeRepository>();
+            builder.Services.AddTransient<IProductTypeService, ProductTypeService>();
 
             var app = builder.Build();
 

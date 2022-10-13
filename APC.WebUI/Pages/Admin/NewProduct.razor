@@ -1,28 +1,95 @@
 ﻿@page "/admin/product/new"
 @inject IProductCategoryService productCategoryService
+@inject IProductTypeService productTypeService
 
 <h1>Add New Product</h1>
 
-<EditForm Model="@Product">
-    <div class="mb-3">
-        <label for="name" class="form-label">Name</label>
-        <InputText @bind-Value="Product.Name" id="firstName" class="form-control" placeholder="Product Name" />
-    </div>
 
-    @*upload photo*@
-</EditForm>
+<div class="row">
+    <div class="col-sm-6">
+        <EditForm Model="@Product" OnValidSubmit="@SaveProduct" OnInvalidSubmit="@InvalidFormSubmit">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <div class="mb-3">
+                <label for="name" class="form-label">Product Name</label>
+                <InputText @bind-Value="Product.Name" id="firstName" class="form-control" placeholder="EJ1522" />
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <InputSelect @bind-Value="categoryId" id="category" class="form-select">
+                    <option></option>
+                    @foreach (var category in ProductCategories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label for="type" class="form-label">Type</label>
+                <InputSelect @bind-Value="typeId" id="type" class="form-select">
+                    <option></option>
+                    @foreach (var type in ProductTypes)
+                    {
+                        <option value="@type.Id">@type.Name</option>
+                    }
+                </InputSelect>
+            </div>
+
+            @*upload photo*@ 
+
+            <button type="submit" class="btn btn-primary">Create</button>
+            <button class="btn btn-secondary">Cancel</button>
+        </EditForm>
+    </div>
+</div>
+
+<p>
+    new name: @Product.Name
+</p>
+<p>
+    new categoryId: @categoryId
+</p>
+<p>
+    new typeId: @typeId
+</p>
+<p>
+    form is valid: @FormIsValid
+</p>
 
 @code {
     public ProductDTO Product { get; set; } = new ProductDTO();
-    public IEnumerable<ProductCategoryDTO> ProductCategories {get; set; }
+
+    public int categoryId { get; set; }
+    public IEnumerable<ProductCategoryDTO> ProductCategories { get; set; } = new List<ProductCategoryDTO>();
+
+    public int typeId { get; set; }
+    public IEnumerable<ProductTypeDTO> ProductTypes { get; set; } = new List<ProductTypeDTO>();
+
+    //temp testing
+    public bool FormIsValid { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
         this.ProductCategories = await productCategoryService.GetProductCategoriesAsync();
+        this.ProductTypes = await productTypeService.GetProductTypesAsync();
     }
 
-    public async Task SaveProduct()
-    {
+    //this doesn't exist in code or database
+    //public async Task<ProductTypeDTO> GetProductTypesByCategory(){ return Task.FromResult()}
 
+    public async Task SaveProduct(EditContext editContext)
+    {
+        FormIsValid = true;
+
+        bool formIsValid = editContext.Validate();
+        if (!formIsValid)
+        {
+            return;
+            formIsValid = false;
+        }
+    }
+
+    public async Task InvalidFormSubmit()
+    {
+        FormIsValid = false;
     }
 }
