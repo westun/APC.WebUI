@@ -16,12 +16,7 @@ else
         </div>
         <div class="float-start ms-3">
             <h2>@Product.Name</h2>
-            @foreach (var attributeValue in Product.AttributeValues)
-            {
-                <p>
-                    <span class="oi oi-circle-check"></span> <strong>@attributeValue.Attribute.Name:</strong> @attributeValue.Value
-                </p>
-            }
+            <ProductAttributeDisplay ProductAttributeValues="Product.AttributeValues"></ProductAttributeDisplay>
             <button href="#" class="btn btn-primary btn-lg">Add to Cart</button>
         </div>
     </div>
