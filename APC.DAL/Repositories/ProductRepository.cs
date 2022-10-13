@@ -28,7 +28,9 @@ namespace APC.DAL.Repositories
                 .Include(p => p.ProductAttributesValues)
                 .ThenInclude(pav => pav.ProductAttribute)
                 .Include(p => p.AreasOfApplications)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.Id == id) 
+                //just to ignore warning
+                ?? new Product();
         }
 
         public async Task<IEnumerable<Product>> GetAsync()

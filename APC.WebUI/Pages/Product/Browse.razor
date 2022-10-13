@@ -27,8 +27,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         await LoadProductsFromDB();
-
-        await base.OnInitializedAsync();
     }
 
     private async Task LoadProductsFromDB()

@@ -36,7 +36,5 @@ else
     protected override async Task OnInitializedAsync()
     {
         this.Product = await productService.GetProductByIdAsync(this.Id);
-
-        await base.OnInitializedAsync();
     }
 }

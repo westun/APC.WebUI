@@ -30,6 +30,10 @@ namespace APC.DAL.DataAccess
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
 
+        public DbSet<AreasOfApplication> AreasOfApplication { get; set; }
+
+        public DbSet<ProductAttribute> ProductAttribute { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //this is old entity framework

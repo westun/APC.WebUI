@@ -1,0 +1,28 @@
+﻿@page "/admin/product/new"
+@inject ProductCategoryService productCategoryService
+
+<h1>Add New Product</h1>
+
+<EditForm Model="@Product">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText @bind-Value="Product.Name" id="firstName" class="form-control" placeholder="Product Name" />
+    </div>
+
+    @*upload photo*@
+</EditForm>
+
+@code {
+    public ProductDTO Product { get; set; } = new ProductDTO();
+    public IEnumerable<ProductCategoryDTO> ProductCategories {get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        this.ProductCategories = await productCategoryService.GetProductCategoriesAsync();
+    }
+
+    public async Task SaveProduct()
+    {
+
+    }
+}
