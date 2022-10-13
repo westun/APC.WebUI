@@ -1,5 +1,8 @@
-﻿using APC.DAL.Repositories;
+﻿using APC.DAL.Models;
+using APC.DAL.Repositories;
 using APC.WebUI.Models;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.EntityFrameworkCore;
 
 namespace APC.WebUI.Services
 {
@@ -19,6 +22,8 @@ namespace APC.WebUI.Services
             return new ProductDTO
             {
                 Id = product.Id,
+                CategoryId = product.CategoryId,
+                TypeId = product.TypeId,
                 Name = product.Name,
                 Description = product.Description,
                 ImageUrl = product.ImageUrl,
@@ -53,6 +58,8 @@ namespace APC.WebUI.Services
             return products.Select(p => new ProductDTO
             {
                 Id = p.Id,
+                CategoryId = p.CategoryId,
+                TypeId = p.TypeId,
                 Name = p.Name,
                 Description = p.Description,
                 ImageUrl = p.ImageUrl,
@@ -65,6 +72,55 @@ namespace APC.WebUI.Services
                     Name = p.Type.Name,
                 }
             });
+        }
+
+        public async Task<ProductDTO> Save(ProductDTO productDTO)
+        {
+            if (productDTO is null)
+            {
+                throw new ArgumentNullException(nameof(productDTO));
+            }
+
+            var product = new Product
+            {
+                Id = productDTO.Id,
+                CategoryId = productDTO.CategoryId,
+                TypeId = productDTO.TypeId,
+                Name = productDTO.Name,
+                Description = productDTO.Description,
+                ImageUrl = productDTO.ImageUrl,
+            };
+
+            var productSavedFromDB = await this.productRepository.Save(product);
+
+            return new ProductDTO
+            {
+                Id = productSavedFromDB.Id,
+                Name = productSavedFromDB.Name,
+                Description = productSavedFromDB.Description,
+                ImageUrl = productSavedFromDB.ImageUrl,
+                Category = new ProductCategoryDTO
+                {
+                    Name = productSavedFromDB?.Category?.Name,
+                },
+                Type = new ProductTypeDTO
+                {
+                    Name = productSavedFromDB?.Type?.Name,
+                },
+                AttributeValues = productSavedFromDB.ProductAttributesValues.Select(pav => new ProductAttributeValueDTO()
+                {
+                    Value = pav.Value,
+                    DisplayOrder = pav.DisplayOrder,
+                    Attribute = new ProductAttributeDTO
+                    {
+                        Name = pav.ProductAttribute.Name,
+                    }
+                }),
+                AreasOfApplications = productSavedFromDB.AreasOfApplications.Select(aoa => new AreasOfApplicationDTO
+                {
+                    Name = aoa.Name,
+                }),
+            };
         }
     }
 }

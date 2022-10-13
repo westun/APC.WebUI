@@ -1,22 +1,34 @@
 ﻿@page "/admin/product/new"
+@inject IProductService productService
 @inject IProductCategoryService productCategoryService
 @inject IProductTypeService productTypeService
 
 <h1>Add New Product</h1>
 
+@if (ShowSuccessAlert)
+{
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        New Product <em>@CreatedProduct.Name</em> has been created succesfully.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="@DismissSuccessAlert"></button>
+    </div>
+}
 
 <div class="row">
     <div class="col-sm-6">
-        <EditForm Model="@Product" OnValidSubmit="@SaveProduct" OnInvalidSubmit="@InvalidFormSubmit">
-            <DataAnnotationsValidator></DataAnnotationsValidator>
+        <EditForm Model="@Product" OnValidSubmit="@SaveProduct">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            @*Custom error message for select controls that don't validate properly*@
+            <ul class="validation-message">@((MarkupString)CustomErrorMessage)</ul>
+
             <div class="mb-3">
                 <label for="name" class="form-label">Product Name</label>
                 <InputText @bind-Value="Product.Name" id="firstName" class="form-control" placeholder="EJ1522" />
             </div>
             <div class="mb-3">
                 <label for="category" class="form-label">Category</label>
-                <InputSelect @bind-Value="categoryId" id="category" class="form-select">
-                    <option></option>
+                <InputSelect @bind-Value="Product.CategoryId" id="category" class="form-select">
+                    <option value=""></option>
                     @foreach (var category in ProductCategories)
                     {
                         <option value="@category.Id">@category.Name</option>
@@ -25,7 +37,7 @@
             </div>
             <div class="mb-3">
                 <label for="type" class="form-label">Type</label>
-                <InputSelect @bind-Value="typeId" id="type" class="form-select">
+                <InputSelect @bind-Value="Product.TypeId" id="type" class="form-select">
                     <option></option>
                     @foreach (var type in ProductTypes)
                     {
@@ -34,62 +46,107 @@
                 </InputSelect>
             </div>
 
-            @*upload photo*@ 
+            <div class="mb-4">
+                <InputFile OnChange="OnPhotoUploadChange"></InputFile>
+            </div>
 
             <button type="submit" class="btn btn-primary">Create</button>
-            <button class="btn btn-secondary">Cancel</button>
+            <button type="button" class="btn btn-secondary">Cancel</button>
         </EditForm>
     </div>
 </div>
 
-<p>
-    new name: @Product.Name
-</p>
-<p>
-    new categoryId: @categoryId
-</p>
-<p>
-    new typeId: @typeId
-</p>
-<p>
-    form is valid: @FormIsValid
-</p>
-
 @code {
     public ProductDTO Product { get; set; } = new ProductDTO();
+    public ProductDTO CreatedProduct { get; set; } = new ProductDTO();
 
-    public int categoryId { get; set; }
     public IEnumerable<ProductCategoryDTO> ProductCategories { get; set; } = new List<ProductCategoryDTO>();
 
-    public int typeId { get; set; }
     public IEnumerable<ProductTypeDTO> ProductTypes { get; set; } = new List<ProductTypeDTO>();
 
-    //temp testing
-    public bool FormIsValid { get; set; }
+    public string CustomErrorMessage { get; set; }
+    public bool ShowSuccessAlert { get; set; }
+
+    public IBrowserFile SelectedFile { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        this.ProductCategories = await productCategoryService.GetProductCategoriesAsync();
-        this.ProductTypes = await productTypeService.GetProductTypesAsync();
+        this.ProductCategories = await this.productCategoryService.GetProductCategoriesAsync();
+        this.ProductTypes = await this.productTypeService.GetProductTypesAsync();
     }
-
-    //this doesn't exist in code or database
-    //public async Task<ProductTypeDTO> GetProductTypesByCategory(){ return Task.FromResult()}
 
     public async Task SaveProduct(EditContext editContext)
     {
-        FormIsValid = true;
+        this.CustomErrorMessage = null;
 
-        bool formIsValid = editContext.Validate();
-        if (!formIsValid)
+        if (!IsFormValid())
         {
             return;
-            formIsValid = false;
         }
+
+        var productWithNewId = await this.productService.Save(this.Product);
+        this.Product.Id = productWithNewId.Id;
+        this.CreatedProduct = productWithNewId;
+
+        //todo: upload file to blob storage, save file name as {Name_ProductId_Category}
+
+        this.ShowSuccessAlert = true;
+
+        this.ClearForm();
     }
 
-    public async Task InvalidFormSubmit()
+    public bool IsFormValid()
     {
-        FormIsValid = false;
+        //form doesn't recognize these fields are required, unless you select a value, then unselect
+        bool isValid;
+        if (this.Product.CategoryId <= 0)
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Category is required. </li>";
+        }
+        else
+        {
+            isValid = true;
+        }
+
+        if (this.Product.TypeId <= 0)
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Type is required. </li>";
+        }
+        else
+        {
+            isValid = true;
+        }
+
+        @if (this.SelectedFile is null)
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Photo Upload is required. </li>";
+        }
+        else
+        {
+            isValid = true;
+        }
+
+        return isValid;
+    }
+
+    public void ClearForm()
+    {
+        this.Product = new ProductDTO();
+        this.SelectedFile = null;
+    }
+
+    public void DismissSuccessAlert()
+    {
+        this.ShowSuccessAlert = false;
+    }
+
+    public void OnPhotoUploadChange(InputFileChangeEventArgs e)
+    {
+        this.SelectedFile = e.File;
+
+        this.StateHasChanged();
     }
 }

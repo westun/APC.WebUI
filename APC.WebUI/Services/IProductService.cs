@@ -6,5 +6,6 @@ namespace APC.WebUI.Services
     {
         Task<ProductDTO> GetProductByIdAsync(int id);
         Task<IEnumerable<ProductDTO>> GetAllProductsAsync();
+        Task<ProductDTO> Save(ProductDTO productDTO);
     }
 }
