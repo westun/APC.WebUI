@@ -51,6 +51,7 @@ namespace APC.WebUI
             builder.Services.AddTransient<IProductCategoryService, ProductCategoryService>();
             builder.Services.AddTransient<IProductTypeRepository, ProductTypeRepository>();
             builder.Services.AddTransient<IProductTypeService, ProductTypeService>();
+            builder.Services.AddTransient<IFileUploadService, AzureBlobFileUploadService>();
 
             var app = builder.Build();
 

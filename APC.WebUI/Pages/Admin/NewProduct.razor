@@ -2,6 +2,7 @@
 @inject IProductService productService
 @inject IProductCategoryService productCategoryService
 @inject IProductTypeService productTypeService
+@inject IFileUploadService fileUploadService
 
 <h1>Add New Product</h1>
 
@@ -47,7 +48,7 @@
             </div>
 
             <div class="mb-4">
-                <InputFile OnChange="OnPhotoUploadChange"></InputFile>
+                <InputFile OnChange="OnPhotoUploadChange" onreset="OnPhotoUploadCancel"></InputFile>
             </div>
 
             <button type="submit" class="btn btn-primary">Create</button>
@@ -61,7 +62,6 @@
     public ProductDTO CreatedProduct { get; set; } = new ProductDTO();
 
     public IEnumerable<ProductCategoryDTO> ProductCategories { get; set; } = new List<ProductCategoryDTO>();
-
     public IEnumerable<ProductTypeDTO> ProductTypes { get; set; } = new List<ProductTypeDTO>();
 
     public string CustomErrorMessage { get; set; }
@@ -84,15 +84,33 @@
             return;
         }
 
+        var fileUploadData = new FileUploadDataDTO
+        {
+            FileName = this.GetUniqueFileName(this.SelectedFile.Name),
+            BrowserFile = this.SelectedFile,
+        };
+        var fileUploadResult = await this.fileUploadService.UploadFile(fileUploadData);
+        
+        this.Product.ImageUrl = fileUploadResult.FileUrl.ToString();
+
         var productWithNewId = await this.productService.Save(this.Product);
         this.Product.Id = productWithNewId.Id;
         this.CreatedProduct = productWithNewId;
 
-        //todo: upload file to blob storage, save file name as {Name_ProductId_Category}
-
         this.ShowSuccessAlert = true;
 
         this.ClearForm();
+    }
+
+    private string GetUniqueFileName(string originalFileName)
+    {
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        var fileExtension = Path.GetExtension(originalFileName);
+
+        Random random = new Random();
+        int randomId = random.Next(1000, 99999);
+
+        return $"{nameWithoutExtension}_{randomId}{fileExtension}";
     }
 
     public bool IsFormValid()
@@ -146,7 +164,11 @@
     public void OnPhotoUploadChange(InputFileChangeEventArgs e)
     {
         this.SelectedFile = e.File;
-
         this.StateHasChanged();
+    }
+
+    public void OnPhotoUploadCancel()
+    {
+        this.SelectedFile = null;
     }
 }
