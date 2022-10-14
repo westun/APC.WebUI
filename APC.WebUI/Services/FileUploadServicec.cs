@@ -1,17 +1,14 @@
 ﻿using APC.WebUI.Models;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Microsoft.AspNetCore.Components.Forms;
 
 namespace APC.WebUI.Services
 {
     public class AzureBlobFileUploadService : IFileUploadService
     {
-        //TODO: put connection string in secure location
         private const string ConnectionString = "DefaultEndpointsProtocol=https;AccountName=apcdevelopment;AccountKey=lZdasgvG5mXWdFn5VXRPsuPNsziS2H+T0lTrtsax//PJBil6YmhbRhiSMWuCykfcdsu3/HUhYrsP+ASthiVXlQ==;EndpointSuffix=core.windows.net";
         private const string BlobContainerName = "products";
 
-        //TODO create a dto that contains additional info, such as fileName or the product object
         public async Task<FileUploadResultDTO> UploadFile(FileUploadDataDTO fileUploadData)
         {
             BlobContainerClient containerClient
