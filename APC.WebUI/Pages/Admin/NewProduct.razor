@@ -9,12 +9,13 @@
 @if (ShowSuccessAlert)
 {
     <div class="alert alert-primary alert-dismissible fade show" role="alert">
-        New Product <em>@CreatedProduct.Name</em> has been created succesfully.
+        New Product <em>@CreatedProduct.Name</em> has been created succesfully.<br/>
+        <a href="admin/product/preview/@CreatedProduct.Id">Click here to view.</a>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="@DismissSuccessAlert"></button>
     </div>
 }
 
-<div class="row">
+<div class="row mb-5">
     <div class="col-sm-6">
         <EditForm Model="@Product" OnValidSubmit="@SaveProduct">
             <DataAnnotationsValidator />
@@ -51,8 +52,12 @@
                 <InputFile OnChange="OnPhotoUploadChange"></InputFile>
             </div>
 
-            <button type="submit" class="btn btn-primary">Create</button>
-            <button type="button" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary me-2">Create</button>
+            @if (this.SaveInProgress)
+            {
+                <span class="spinner-border text-success align-middle"></span>
+            }
+            <button type="button" class="btn btn-secondary ms-3">Cancel</button>
         </EditForm>
     </div>
 </div>
@@ -66,6 +71,7 @@
 
     public string CustomErrorMessage { get; set; }
     public bool ShowSuccessAlert { get; set; }
+    public bool SaveInProgress { get; set; }
 
     public IBrowserFile SelectedFile { get; set; }
 
@@ -84,18 +90,27 @@
             return;
         }
 
-        var fileUploadData = new FileUploadDataDTO
-        {
-            FileName = this.GetUniqueFileName(this.SelectedFile.Name),
-            BrowserFile = this.SelectedFile,
-        };
-        var fileUploadResult = await this.fileUploadService.UploadFile(fileUploadData);
-        
-        this.Product.ImageUrl = fileUploadResult.FileUrl.ToString();
+        this.SaveInProgress = true;
 
-        var productWithNewId = await this.productService.Save(this.Product);
-        this.Product.Id = productWithNewId.Id;
-        this.CreatedProduct = productWithNewId;
+        try
+        {
+            var fileUploadData = new FileUploadDataDTO
+            {
+                FileName = this.GetUniqueFileName(this.SelectedFile.Name),
+                BrowserFile = this.SelectedFile,
+            };
+            var fileUploadResult = await this.fileUploadService.UploadFile(fileUploadData);
+
+            this.Product.ImageUrl = fileUploadResult.FileUrl.ToString();
+
+            var productWithNewId = await this.productService.Save(this.Product);
+            this.Product.Id = productWithNewId.Id;
+            this.CreatedProduct = productWithNewId;
+        }
+        finally 
+        {
+            this.SaveInProgress = false;
+        }
 
         this.ShowSuccessAlert = true;
 
@@ -137,7 +152,7 @@
             isValid = true;
         }
 
-        @if (this.SelectedFile is null)
+    @if (this.SelectedFile is null)
         {
             isValid = false;
             this.CustomErrorMessage += "<li>Photo Upload is required. </li>";
