@@ -53,6 +53,8 @@ namespace APC.WebUI
             builder.Services.AddTransient<IProductTypeService, ProductTypeService>();
             builder.Services.AddTransient<IFileUploadService, AzureBlobFileUploadService>();
 
+            builder.Services.AddAutoMapper(typeof(Program));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
