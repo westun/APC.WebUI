@@ -6,7 +6,7 @@
         public string Value { get; set; }
         public int DisplayOrder { get; set; } = 0;
 
-        public Product Product { get; set; } = new Product();
-        public ProductAttribute ProductAttribute { get; set; } = new ProductAttribute();
+        public Product Product { get; set; }
+        public ProductAttribute ProductAttribute { get; set; }
     }
 }

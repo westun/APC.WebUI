@@ -1,7 +1,9 @@
 ﻿@foreach (var attributeValue in ProductAttributeValues)
 {
     <p>
-        <span class="oi oi-circle-check"></span> <strong>@attributeValue.Attribute.Name:</strong> @attributeValue.Value
+        <span class="oi oi-circle-check"></span> 
+        <strong>@attributeValue.ProductAttribute.Name:</strong>
+        @attributeValue.Value
     </p>
 }
 
