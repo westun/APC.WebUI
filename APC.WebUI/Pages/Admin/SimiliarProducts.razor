@@ -1,0 +1,22 @@
+﻿@page "/admin/product/similar"
+@inject ISimilarProductsService similarProductService
+
+<h3>SimilarProducts</h3>
+
+@if (SimilarProducts is not null)
+{
+    foreach (var product in SimilarProducts)
+    {
+        <p>@*@product.*@</p>
+    }
+}
+
+@code {
+    private IEnumerable<SimilarProductsDTO> SimilarProducts { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.SimilarProducts = await similarProductService.GetSimilarProductsByProductIdAsync(3);
+
+    }
+}

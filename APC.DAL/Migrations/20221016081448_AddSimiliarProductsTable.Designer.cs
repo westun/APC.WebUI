@@ -3,6 +3,7 @@ using APC.DAL.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APC.DAL.Migrations
 {
     [DbContext(typeof(APCContext))]
-    partial class APCContextModelSnapshot : ModelSnapshot
+    [Migration("20221016081448_AddSimiliarProductsTable")]
+    partial class AddSimiliarProductsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,7 +162,7 @@ namespace APC.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("SimilarProductId")
+                    b.Property<int>("SimiliarProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("TheProductid")
@@ -168,7 +170,7 @@ namespace APC.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SimilarProductId");
+                    b.HasIndex("SimiliarProductId");
 
                     b.HasIndex("TheProductid");
 
@@ -230,9 +232,9 @@ namespace APC.DAL.Migrations
 
             modelBuilder.Entity("APC.DAL.Models.SimilarProducts", b =>
                 {
-                    b.HasOne("APC.DAL.Models.Product", "SimilarProduct")
+                    b.HasOne("APC.DAL.Models.Product", "SimiliarProduct")
                         .WithMany()
-                        .HasForeignKey("SimilarProductId")
+                        .HasForeignKey("SimiliarProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -242,7 +244,7 @@ namespace APC.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("SimilarProduct");
+                    b.Navigation("SimiliarProduct");
 
                     b.Navigation("TheProduct");
                 });

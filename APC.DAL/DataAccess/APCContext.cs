@@ -34,6 +34,8 @@ namespace APC.DAL.DataAccess
 
         public DbSet<ProductAttribute> ProductAttribute { get; set; }
 
+        public DbSet<SimilarProducts> SimilarProducts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //this is old entity framework

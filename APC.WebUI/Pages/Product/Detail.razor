@@ -1,12 +1,13 @@
 ﻿@page "/products/browse/detail"
 @page "/products/browse/detail/{id:int}"
 @inject IProductService productService
+@inject ISimilarProductsService similarProductService
 
 <h1>Product Detail</h1>
 
 @if (Product is null)
 {
-    <div><em>Loading...</em></div>
+    <div class="spinner-border text-success"></div>
 }
 else
 {
@@ -21,20 +22,30 @@ else
         </div>
     </div>
 
-    <div class="mb-5">
+    <div class="mb-3">
         <h2>Areas of Application</h2>
         <AreasOfApplicationDisplay AreasOfApplications="Product.AreasOfApplications"></AreasOfApplicationDisplay>
     </div>
+
+    if (SimilarProducts is not null)
+    {
+        <div class="mb-5">
+            <h2>Similar Items</h2>
+            <SimilarProductsDisplay SimilarProducts="SimilarProducts" />
+        </div>
+    }
 }
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
-    public ProductDTO Product { get; set; }
+    private ProductDTO Product { get; set; }
+    private IEnumerable<SimilarProductsDTO> SimilarProducts { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         this.Product = await productService.GetProductByIdAsync(this.Id);
+        this.SimilarProducts = await similarProductService.GetSimilarProductsByProductIdAsync(this.Id);
     }
 }
