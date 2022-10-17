@@ -34,8 +34,9 @@ namespace APC.WebUI
 
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor()
-                .AddMicrosoftIdentityConsentHandler()
-                .AddCircuitOptions(options => { options.DetailedErrors = true; });
+                .AddMicrosoftIdentityConsentHandler();
+                //to display errors in hosted site
+                //.AddCircuitOptions(options => { options.DetailedErrors = true; });
 
             //builder.Services.AddDbContextFactory<APCContext>(options =>
             //    options.UseSqlServer("server=localhost;Initial Catalog=APC;Integrated Security=true;"));
