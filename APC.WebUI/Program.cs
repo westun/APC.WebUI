@@ -38,11 +38,8 @@ namespace APC.WebUI
                 //to display errors in hosted site
                 //.AddCircuitOptions(options => { options.DetailedErrors = true; });
 
-            //builder.Services.AddDbContextFactory<APCContext>(options =>
-            //    options.UseSqlServer("server=localhost;Initial Catalog=APC;Integrated Security=true;"));
-
             builder.Services.AddDbContextFactory<APCContext>(options =>
-                options.UseSqlServer("Server=tcp:americanpaperco.database.windows.net,1433;Initial Catalog=APC;Persist Security Info=False;User ID=balarychentimen;Password=ppYRiF0I3LSMzcId3DdF3C8zFX;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
 
             //scoped service isn't ideal for blazor apps
             //builder.Services.AddDbContext<APCContext>(options =>
