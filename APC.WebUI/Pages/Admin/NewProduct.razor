@@ -25,7 +25,11 @@
 
             <div class="mb-3">
                 <label for="name" class="form-label">Product Name</label>
-                <InputText @bind-Value="Product.Name" id="firstName" class="form-control" placeholder="EJ1522" />
+                <InputText @bind-Value="Product.Name" id="name" class="form-control" placeholder="EJ1522" />
+            </div>
+            <div class="mb-3">
+                <label for="displayname" class="form-label">Display Name</label>
+                <InputText @bind-Value="Product.DisplayName" class="form-control" placeholder='EJ1522 – 10" Jumbo Tissue'></InputText>
             </div>
             <div class="mb-3">
                 <label for="category" class="form-label">Category</label>

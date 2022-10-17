@@ -11,7 +11,9 @@ namespace APC.WebUI.Models
         [Required(ErrorMessage = "Product Name is required.")]
         public string Name { get; set; }
 
+        [Required(ErrorMessage = "Product Display Name is required.")]
         public string DisplayName { get; set; }
+
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
 
