@@ -59,6 +59,8 @@ namespace APC.WebUI
 
             builder.Services.AddAutoMapper(typeof(Program));
 
+            builder.Services.AddHttpContextAccessor();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
