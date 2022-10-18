@@ -11,13 +11,15 @@
 }
 else
 {
-    <div class="row">
-        @foreach (var product in Products)
-        {
-            <div class="col-sm-4 mb-3">
-                <ProductItemDisplay Product="product"></ProductItemDisplay>
-            </div>
-        }
+    <div class="container">
+        <div class="row">
+            @foreach (var product in Products)
+            {
+                <div class="col-sm-4 mb-3">
+                    <ProductItemDisplay Product="product"></ProductItemDisplay>
+                </div>
+            }
+        </div>
     </div>
 }
 
