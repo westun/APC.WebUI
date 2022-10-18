@@ -3,7 +3,7 @@
 
 @if (Product is null)
 {
-    <div class="spinner-border text-success"></div>
+    <Spinner/>
 }
 else
 {
@@ -25,8 +25,13 @@ else
     public int Id { get; set; }
     public ProductDTO Product { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        this.Product = await this.productService.GetProductByIdAsync(this.Id);
+        if (firstRender)
+        {
+            this.Product = await this.productService.GetProductByIdAsync(this.Id);
+        }
+
+        this.StateHasChanged();
     }
 }
