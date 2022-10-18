@@ -7,7 +7,9 @@
 
 @if (Products is null || !Products.Any())
 {
-    <div class="spinner-border text-success"></div>
+    <div class="text-center mt-5">
+        <div class="spinner-border spinner-xlg text-success "></div>
+    </div>
 }
 else
 {
@@ -24,9 +26,14 @@ else
 @code {
     private IEnumerable<ProductDTO> Products = new List<ProductDTO>();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadProductsFromDB();
+        if (firstRender)
+        {
+            await LoadProductsFromDB();
+        }
+
+        StateHasChanged();
     }
 
     private async Task LoadProductsFromDB()
