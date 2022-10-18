@@ -13,11 +13,14 @@
 @inject IHttpContextAccessor httpContextAccessor
 
 @code{
-    public string UserName { get; set; }
+    public string UserName { get; set; } = "John Doe";
 
     protected override void OnInitialized()
     {
-        var user = this.httpContextAccessor.HttpContext.User;
-        UserName = user.Identity?.Name! ?? "John Doe";
+        if (this.httpContextAccessor.HttpContext != null)
+        {
+            var user = this.httpContextAccessor.HttpContext.User;
+            UserName = user.Identity?.Name! ?? "John Doe";
+        }
     }
 }
