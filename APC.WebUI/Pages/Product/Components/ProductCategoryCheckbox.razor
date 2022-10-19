@@ -1,14 +1,16 @@
 ﻿<EditForm Model="CategoryCheckboxVM">
-    <InputCheckbox @bind-Value="CategoryCheckboxVM.IsChecked"
-                   type="checkbox"
-                   class="form-check-input"
-                   id="@UniqueInputId"
-                   @onclick="() => OnClickHandler(CategoryCheckboxVM)">
-    </InputCheckbox>
+    <div class="form-check">
+        <InputCheckbox @bind-Value="CategoryCheckboxVM.IsChecked"
+                        type="checkbox"
+                        class="form-check-input"
+                        id="@UniqueInputId"
+                        @onclick="() => OnClickHandler(CategoryCheckboxVM)">
+        </InputCheckbox>
 
-    <label class="form-check-label" for="@UniqueInputId">
-        @CategoryCheckboxVM.Category.Name
-    </label>
+        <label class="form-check-label" for="@UniqueInputId">
+            @CategoryCheckboxVM.Category.Name
+        </label>
+    </div>
 </EditForm>
 
 @code {
