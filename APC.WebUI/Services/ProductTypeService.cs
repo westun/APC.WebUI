@@ -19,7 +19,13 @@ namespace APC.WebUI.Services
             return categories.Select(c => new ProductTypeDTO
             {
                 Id = c.Id,
-                Name = c.Name
+                Name = c.Name,
+                CategoryId = c.CategoryId,
+                Category = new ProductCategoryDTO
+                {
+                    Id = c.Category.Id,
+                    Name = c.Category.Name,
+                }
             });
         }
     }
