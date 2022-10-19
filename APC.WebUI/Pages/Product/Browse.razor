@@ -39,6 +39,7 @@ else
     private IEnumerable<ProductDTO> Products = new List<ProductDTO>();
 
     private IEnumerable<ProductCategoryDTO> Categories = new List<ProductCategoryDTO>();
+
     //array allows mutability, it seems.
     private ProductCategoryCheckboxVM[] CategoryCheckboxVMs = new ProductCategoryCheckboxVM[0];
 
@@ -60,14 +61,14 @@ else
 
     private async Task OnCategoryFilterClick(ProductCategoryCheckboxVM categoryCheckbox)
     {
-        var products = await productService.GetAllProductsAsync();
+        var productsFromDB = await productService.GetAllProductsAsync();
 
         int[] selectedIds = this.CategoryCheckboxVMs
                 .Where(p => p.IsChecked)
                 .Select(p => p.Category.Id)
                 .ToArray();
 
-        this.Products = products
+        this.Products = productsFromDB
             .Where(p => selectedIds.Contains(p.CategoryId))
             .ToList();
     }
