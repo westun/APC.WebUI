@@ -1,9 +1,10 @@
 ﻿@page "/products/browse"
 @inject IProductService productService
+@inject IProductCategoryService productCategoryService
 
 <PageTitle>Browse products</PageTitle>
 
-<h1>Browse Products</h1>
+<h1 class="mb-5">Browse Products</h1>
 
 @if (Products is null || !Products.Any())
 {
@@ -11,12 +12,23 @@
 }
 else
 {
-    <div class="container">
-        <div class="row">
-            @foreach (var product in Products)
+    <div class="">
+        <div class="float-sm-start mb-3">
+            <h3>Filters</h3>
+            <h4>Category</h4>
+            @for (int i = 0; i < this.CategoryCheckboxVMs.Count(); i++)
             {
-                <div class="col-sm-4 mb-3">
-                    <ProductItemDisplay Product="product"></ProductItemDisplay>
+                <ProductCategoryCheckbox 
+                    CategoryCheckboxVM="this.CategoryCheckboxVMs[i]"
+                    OnClickCallback="OnCategoryFilterClick">
+                </ProductCategoryCheckbox>
+            }
+        </div>
+        <div class="d-flex row">
+            @foreach (var product in this.Products)
+            {
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <ProductItemDisplay Product="product"/>
                 </div>
             }
         </div>
@@ -26,18 +38,37 @@ else
 @code {
     private IEnumerable<ProductDTO> Products = new List<ProductDTO>();
 
+    private IEnumerable<ProductCategoryDTO> Categories = new List<ProductCategoryDTO>();
+    //array allows mutability, it seems.
+    private ProductCategoryCheckboxVM[] CategoryCheckboxVMs = new ProductCategoryCheckboxVM[0];
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await LoadProductsFromDB();
+            this.Products = await productService.GetAllProductsAsync();
+            this.Categories = await productCategoryService.GetProductCategoriesAsync();
+
+            this.CategoryCheckboxVMs = this.Categories.Select(c => new ProductCategoryCheckboxVM
+            {
+                Category = c,
+            }).ToArray();
         }
 
         StateHasChanged();
     }
 
-    private async Task LoadProductsFromDB()
+    private async Task OnCategoryFilterClick(ProductCategoryCheckboxVM categoryCheckbox)
     {
-        this.Products = await productService.GetAllProductsAsync();
+        var products = await productService.GetAllProductsAsync();
+
+        int[] selectedIds = this.CategoryCheckboxVMs
+                .Where(p => p.IsChecked)
+                .Select(p => p.Category.Id)
+                .ToArray();
+
+        this.Products = products
+            .Where(p => selectedIds.Contains(p.CategoryId))
+            .ToList();
     }
 }
