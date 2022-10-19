@@ -33,7 +33,12 @@
             </div>
             <div class="mb-3">
                 <label for="category" class="form-label">Category</label>
-                <InputSelect @bind-Value="Product.CategoryId" id="category" class="form-select">
+                <InputSelect 
+                    Value="Product.CategoryId"
+                    ValueExpression="(() => Product.CategoryId)"
+                    ValueChanged="@((int args) => { Product.CategoryId = args; OnProductCategoryChange(args); })"
+                    id="category" 
+                    class="form-select">
                     <option value=""></option>
                     @foreach (var category in ProductCategories)
                     {
@@ -83,7 +88,6 @@
     protected async override Task OnInitializedAsync()
     {
         this.ProductCategories = await this.productCategoryService.GetProductCategoriesAsync();
-        this.ProductTypes = await this.productTypeService.GetProductTypesAsync();
     }
 
     public async Task SaveProduct(EditContext editContext)
@@ -184,6 +188,14 @@
     public void OnPhotoUploadChange(InputFileChangeEventArgs e)
     {
         this.SelectedFile = e.File;
+        this.StateHasChanged();
+    }
+
+    public async Task OnProductCategoryChange(int selectedCategoryID)
+    {
+        var typesFromDB = await this.productTypeService.GetProductTypesAsync();
+        this.ProductTypes = typesFromDB.Where(t => t.CategoryId == selectedCategoryID);
+
         this.StateHasChanged();
     }
 }
