@@ -54,9 +54,9 @@ else
             {
                 Category = c,
             }).ToArray();
+            
+            this.StateHasChanged();
         }
-
-        StateHasChanged();
     }
 
     private async Task OnCategoryFilterClick(ProductCategoryCheckboxVM categoryCheckbox)
