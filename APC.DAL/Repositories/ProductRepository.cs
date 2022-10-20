@@ -39,7 +39,30 @@ namespace APC.DAL.Repositories
         public async Task<Product> Save(Product product)
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
-            await dbContext.Products.AddAsync(product);
+            var addingNewProduct = product.Id <= 0;
+            if (addingNewProduct)
+            {
+                await dbContext.Products.AddAsync(product);
+                await dbContext.SaveChangesAsync();
+
+                return product;
+            }
+
+            //get entity from dbContext, edit it, then save changes to change existing data
+            var existingProduct = dbContext.Products.FirstOrDefault(p => p.Id == product.Id);
+            if (existingProduct is null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(existingProduct.Id));
+            }
+
+            //https://stackoverflow.com/questions/46657813/how-to-update-record-using-entity-framework-core
+            existingProduct.Name = product.Name;
+            existingProduct.DisplayName = product.DisplayName;
+            existingProduct.Description = product.Description;
+            existingProduct.CategoryId = product.CategoryId;
+            existingProduct.TypeId = product.TypeId;
+            existingProduct.ImageUrl = product.ImageUrl;
+
             await dbContext.SaveChangesAsync();
 
             return product;
