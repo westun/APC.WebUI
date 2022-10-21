@@ -1,17 +1,17 @@
 using APC.DAL.DataAccess;
 using APC.DAL.Repositories;
+using APC.WebUI.Models;
 using APC.WebUI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Logging;
+using System.Linq.Dynamic.Core;
+using System.Security.Claims;
 
 namespace APC.WebUI
 {
@@ -23,7 +23,19 @@ namespace APC.WebUI
 
             // Add services to the container.
             builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+                .AddMicrosoftIdentityWebApp(options =>
+                {
+                    builder.Configuration.Bind("AzureAd", options);
+
+                    options.Events = new OpenIdConnectEvents
+                    {
+                        OnTicketReceived = async ctxt => 
+                        { 
+                            await OnTicketReceived(ctxt, builder);
+                        }
+                    };
+                });
+
             builder.Services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
 
@@ -41,8 +53,8 @@ namespace APC.WebUI
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor()
                 .AddMicrosoftIdentityConsentHandler();
-                //to display errors in hosted site
-                //.AddCircuitOptions(options => { options.DetailedErrors = true; });
+            //to display errors in hosted site
+            //.AddCircuitOptions(options => { options.DetailedErrors = true; });
 
             builder.Services.AddDbContextFactory<APCContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
@@ -68,6 +80,9 @@ namespace APC.WebUI
             builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
+
+            //wheeee...
+            var apcContext = app.Services.GetService<IDbContextFactory<APCContext>>();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -96,6 +111,80 @@ namespace APC.WebUI
             app.MapFallbackToPage("/_Host");
 
             app.Run();
+        }
+
+        private static async Task OnTicketReceived(
+            TicketReceivedContext ctxt,
+            WebApplicationBuilder builder)
+        {
+            if (ctxt.Principal == null)
+            {
+                await Task.Yield();
+            }
+
+            if (ctxt.Principal.Identity is ClaimsIdentity identity)
+            {
+                var authClaims = GetAuthClaims(ctxt.Principal.Claims);
+
+                var request = ctxt.HttpContext.Request;
+                var host = request.Host.ToUriComponent();
+
+                //request.Path = "/admin/product/new";
+            }
+
+            // Insert into Database
+            var optionsBuilder = new DbContextOptionsBuilder<APCContext>();
+            optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("default"));
+            APCContext dbContext = new APCContext(optionsBuilder.Options);
+
+            //var serviceProvider = builder.Services.BuildServiceProvider();
+            //var context = serviceProvider.GetRequiredService<IDbContextFactory>();
+            
+            //lookup account in db by claim email, if found, save oid
+            
+            await Task.Yield();
+        }
+
+        private static async Task<AuthClaims> GetAuthClaims(IEnumerable<Claim> claims)
+        {
+            AuthClaims authClaims = new AuthClaims();
+
+            var colClaims = await claims.ToDynamicListAsync();
+
+            authClaims.IdentityProvider = colClaims.FirstOrDefault(
+                c => c.Type == "http://schemas.microsoft.com/identity/claims/identityprovider")?.Value;
+
+            authClaims.Objectidentifier = colClaims.FirstOrDefault(
+                c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+
+            authClaims.EmailAddress = colClaims.FirstOrDefault(
+                c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+
+            if (string.IsNullOrEmpty(authClaims.EmailAddress))
+            {
+                authClaims.EmailAddress = colClaims.FirstOrDefault(
+                c => c.Type == "emails")?.Value;
+            }
+
+            authClaims.FirstName = colClaims.FirstOrDefault(
+                c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value;
+
+            authClaims.LastName = colClaims.FirstOrDefault(
+                c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value;
+
+            authClaims.AzureB2CFlow = colClaims.FirstOrDefault(
+                c => c.Type == "http://schemas.microsoft.com/claims/authnclassreference")?.Value;
+
+            authClaims.auth_time = colClaims.FirstOrDefault(
+                c => c.Type == "auth_time")?.Value;
+
+            authClaims.DisplayName = colClaims.FirstOrDefault(
+                c => c.Type == "name")?.Value;
+
+            authClaims.idp_access_token = colClaims.FirstOrDefault(
+                c => c.Type == "idp_access_token")?.Value;
+
+            return authClaims;
         }
     }
 }
