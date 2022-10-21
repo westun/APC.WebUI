@@ -4,6 +4,7 @@ using APC.WebUI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -30,6 +31,11 @@ namespace APC.WebUI
             {
                 // By default, all incoming requests will be authorized according to the default policy
                 options.FallbackPolicy = options.DefaultPolicy;
+
+                //TODO: configurate admin authorization
+                var authAdminRequirement = new RolesAuthorizationRequirement(new string[] { "Admin" });
+                options.AddPolicy("admin-policy", policy =>
+                    policy.Requirements.Add(authAdminRequirement));
             });
 
             builder.Services.AddRazorPages();
