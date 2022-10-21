@@ -12,17 +12,20 @@
 }
 else
 {
-    <div class="">
+    <div class="clearfix">
         <div class="float-sm-start mb-3">
-            <h3>Filters</h3>
-            <h4>Category</h4>
-            @for (int i = 0; i < this.CategoryCheckboxVMs.Count(); i++)
-            {
-                <ProductCategoryCheckbox 
-                    CategoryCheckboxVM="this.CategoryCheckboxVMs[i]"
-                    OnClickCallback="OnCategoryFilterClick">
-                </ProductCategoryCheckbox>
-            }
+            <div class="card">
+                <div class="card-body p-6">
+                    <h4>Categories</h4>
+                    @for (int i = 0; i < this.CategoryCheckboxVMs.Count(); i++)
+                    {
+                        <ProductCategoryCheckbox 
+                            CategoryCheckboxVM="this.CategoryCheckboxVMs[i]"
+                            OnClickCallback="OnCategoryFilterClick">
+                        </ProductCategoryCheckbox>
+                    }
+                </div>
+            </div>
         </div>
         <div class="d-flex row">
             @foreach (var product in this.Products)
