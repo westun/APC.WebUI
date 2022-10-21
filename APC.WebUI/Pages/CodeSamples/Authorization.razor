@@ -1,0 +1,34 @@
+﻿@*@attribute [Authorize("adminPolicy")]*@
+@page "/authorize/test"
+@inject AuthenticationStateProvider authenticationStateProvider 
+
+<h3>Authorization</h3>
+
+<AuthorizeView Policy="adminPolicy" Roles="Admin">
+    You can see this if you're an admin.
+</AuthorizeView>
+
+@code {
+    //option2
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; } 
+
+
+    //option 1
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+    //    var user = authState.User;
+
+    //    //add role "Admin" as a claim
+
+    //    var isAdmin = user.IsInRole("Admin");
+    //}
+
+    //option 2
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+    }
+}
