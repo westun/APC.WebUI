@@ -117,31 +117,38 @@ namespace APC.WebUI
             TicketReceivedContext ctxt,
             WebApplicationBuilder builder)
         {
-            if (ctxt.Principal == null)
+            if (ctxt.Principal == null
+                || ctxt.Principal.Identity is not ClaimsIdentity identity)
             {
                 await Task.Yield();
+                return;
             }
 
-            if (ctxt.Principal.Identity is ClaimsIdentity identity)
-            {
-                var authClaims = GetAuthClaims(ctxt.Principal.Claims);
+            var authClaims = await GetAuthClaims(ctxt.Principal.Claims);
 
-                var request = ctxt.HttpContext.Request;
-                var host = request.Host.ToUriComponent();
-
-                //request.Path = "/admin/product/new";
-            }
-
-            // Insert into Database
             var optionsBuilder = new DbContextOptionsBuilder<APCContext>();
             optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("default"));
             APCContext dbContext = new APCContext(optionsBuilder.Options);
 
-            //var serviceProvider = builder.Services.BuildServiceProvider();
-            //var context = serviceProvider.GetRequiredService<IDbContextFactory>();
+            var account = dbContext.Account
+                .FirstOrDefault(a => a.Email.ToLower() == (authClaims.EmailAddress ?? "").ToLower());
+
+            if (account is null)
+            {
+                //user is invalid, only users who have an account in the system
+                //matching email can access the site.
+                //TODO: sign out user and display error message
+                return;
+            }
             
-            //lookup account in db by claim email, if found, save oid
-            
+            var isMissingOID = account is not null 
+                && string.IsNullOrEmpty(account.ObjectIdentifier);
+            if (isMissingOID)
+            {
+                account.ObjectIdentifier = authClaims.Objectidentifier;
+                dbContext.SaveChanges();
+            }
+
             await Task.Yield();
         }
 
