@@ -33,6 +33,7 @@ namespace APC.DAL.Repositories
                 .Include(p => p.Type)
                 .OrderBy(p => p.Type.Name)
                 .ThenBy(p => p.Name)
+                .Include(p => p.AreasOfApplications)
                 .ToListAsync();
         }
 

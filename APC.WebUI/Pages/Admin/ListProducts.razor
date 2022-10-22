@@ -1,8 +1,52 @@
 ﻿@page "/admin/product/list"
+@using APC.WebUI.Pages.Admin.Components;
+@inject IProductService productService
 
-<h3>Products List</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h3>Products List</h3>
+        </div>
+    </div>
+</div>
+
+@if (Products is null)
+{
+    <Spinner/>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <p>
+                    There are <span class="text-primary">@Products.Count()</span> Products
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row row-cols-1 row-cols-lg-4 row-cols-md-3 g-4 g-lg-4">
+            @foreach (var product in Products)
+            {
+                <div class="col">
+                    <ProductListItem Product="product" />
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @code {
-    public ProductDTO[] Products { get; set; } = new ProductDTO[0];
+    public ProductDTO[] Products { get; set; }
     
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            this.Products = (await productService.GetAllProductsAsync()).ToArray();
+            this.StateHasChanged();
+        }
+    }
 }

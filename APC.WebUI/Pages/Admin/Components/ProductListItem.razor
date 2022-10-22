@@ -1,0 +1,41 @@
+﻿<div class="card p-6 card-product">
+    <div>
+        <img src="@Product.ImageUrl" alt="" class="rounded-circle icon-shape icon-xl">
+    </div>
+    <div class="mt-4">
+        <h2 class="mb-1 h5">
+            <a href="admin/product/@Product.Id" class="text-inherit">@Product.Name</a>
+        </h2>
+        <div class="small text-muted">
+            <span class="me-2">@Product.Category.Name</span>
+        </div>
+        <div class="small text-muted">
+            <span class="me-2">@Product.Type.Name</span>
+        </div>
+        @*<div class="py-3">
+            <ul class="list-unstyled mb-0 small">
+                <li>
+                    Delivery
+                </li>
+                <li>Pickup available</li>
+            </ul>
+        </div>*@
+        @if (Product.AreasOfApplications.Any())
+        {
+            <div class="mb-2 mt-2">
+                @foreach (var areasOfApplication in Product.AreasOfApplications)
+                {
+                    <div class="badge text-bg-light border me-1 mb-1">@areasOfApplication.Name</div>
+                }
+            </div>
+        }
+        <div class="mt-2">
+            <a href="admin/product/@Product.Id" class="btn btn-primary">Make Changes</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ProductDTO Product { get; set; }
+}

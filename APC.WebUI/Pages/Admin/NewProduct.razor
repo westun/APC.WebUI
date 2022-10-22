@@ -7,14 +7,20 @@
 @inject IProductTypeService productTypeService
 @inject IFileUploadService fileUploadService
 
-@if (Product.Id > 0)
-{
-    <h1>Modify Product</h1>
-}
-else
-{
-    <h1>Add New Product</h1>
-}
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            @if (Product.Id > 0)
+            {
+                <h1>Modify Product</h1>
+            }
+            else
+            {
+                <h1>Add New Product</h1>
+            }
+        </div>
+    </div>
+</div>
 
 @if (ShowSuccessAlert)
 {
@@ -23,8 +29,9 @@ else
         OnDismissClickCallback="DismissSuccessAlert" />
 }
 
-<div class="row mb-5">
-    <div class="col-sm-6">
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-sm-6">
         <EditForm Model="@Product" OnValidSubmit="@SaveProduct">
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -73,14 +80,33 @@ else
                     <InputFile OnChange="OnPhotoUploadChange" class="form-control"></InputFile>
                 </div>
             }
-
-            <button type="submit" class="btn btn-primary me-2">Save</button>
-            @if (this.SaveInProgress)
-            {
-                <span class="spinner-border text-success align-middle"></span>
-            }
-            <a href="admin/product/list" class="btn btn-secondary ms-3">Cancel</a>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary me-2">Save</button>
+                @if (this.SaveInProgress)
+                {
+                    <span class="spinner-border text-success align-middle"></span>
+                }
+                <a href="admin/product/list" class="btn btn-secondary ms-3">Cancel</a>
+            </div>
         </EditForm>
+
+        @if (Product.Id > 0)
+        {
+            <hr />
+            <h2 class="mt-3">More Options</h2>
+            <p>
+                <a href="admin/product/@Product.Id/areaofappliation" class="btn btn-primary">Edit Areas of Application</a>
+            </p>
+            <p>
+                <a href="admin/product/@Product.Id/attribute" class="btn btn-primary">Edit Product Attributes</a>
+            </p>
+            <p>
+                <a href="admin/product/@Product.Id/similar" class="btn btn-primary">Edit Similar Products</a>
+            </p>
+            <p>
+                <a href="admin/product/@Product.Id/compatible" class="btn btn-primary">Edit Compatible Products</a>
+            </p>
+        }
     </div>
 
     @if (Product.Id > 0)
@@ -96,6 +122,7 @@ else
             }
         </div>
     }
+</div>
 </div>
 
 @code {

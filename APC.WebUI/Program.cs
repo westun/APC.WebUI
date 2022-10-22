@@ -74,6 +74,8 @@ namespace APC.WebUI
             builder.Services.AddTransient<IFileUploadService, AzureBlobFileUploadService>();
             builder.Services.AddTransient<ISimilarProductsRepository, SimilarProductsRepository>();
             builder.Services.AddTransient<ISimilarProductsService, SimilarProductsService>();
+            builder.Services.AddTransient<IAreasOfApplicationRepository, AreasOfApplicationRepository>();
+            builder.Services.AddTransient<IAreasOfApplicationService, AreasOfApplicationService>();
 
             builder.Services.AddAutoMapper(typeof(Program));
 

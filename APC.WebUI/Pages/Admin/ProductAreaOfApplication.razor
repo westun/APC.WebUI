@@ -1,0 +1,80 @@
+﻿@page "/admin/product/{productid:int}/areaofappliation"
+@inject IProductService productService
+@inject IAreasOfApplicationService areasOfApplicationService
+
+<h3>Areas Of Application</h3>
+
+@if (AreasOfApplicationVMs is null)
+{
+    <Spinner></Spinner>
+}
+else
+{
+    <p class="mt-5">
+        Make Changes for: <strong><span class="text-success">@Product.Name</span></strong>
+    </p>
+    <EditForm Model="AreasOfApplicationVMs" OnValidSubmit="OnValidSubmit">
+
+        @foreach (var aoa in AreasOfApplicationVMs)
+        {
+            <div class="form-check form-switch">
+                <InputCheckbox 
+                    @bind-Value="@aoa.IsChecked"
+                    id="@aoa.Id"
+                    class="form-check-input" />
+                <label class="form-check-label" for="@aoa.Id">
+                    @aoa.Name
+                </label>
+            </div>
+        }
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="admin/product/list" class="btn btn-secondary">Cancel</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private AreasOfApplicationVM[] AreasOfApplicationVMs { get; set; }
+
+    private IEnumerable<AreasOfApplicationDTO> AllAreasOfApplication {get;set;}
+    private ProductDTO Product { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            this.Product = await this.productService.GetProductByIdAsync(this.ProductId);
+            var selectedIds = this.Product.AreasOfApplications.Select(aoa => aoa.Id).ToArray();
+
+            this.AllAreasOfApplication = await this.areasOfApplicationService.GetAreasOfApplicationAsync();
+
+            this.AreasOfApplicationVMs = this.AllAreasOfApplication.Select(aoa => new AreasOfApplicationVM
+            {
+                Id = aoa.Id,
+                Name = aoa.Name,
+                IsChecked = selectedIds.Contains(aoa.Id),
+            }).ToArray();
+
+            this.StateHasChanged();
+        }
+    }
+
+    private void OnValidSubmit()
+    {
+        var updatedAreasOfApplicationDTOs = this.AreasOfApplicationVMs
+            .Where(aoa => aoa.IsChecked)
+            .Select(aoa => new AreasOfApplicationDTO
+            { 
+                Id = aoa.Id,
+                Name = aoa.Name,
+            });
+
+        this.areasOfApplicationService
+            .SaveProductAreasOfApplication(this.ProductId, updatedAreasOfApplicationDTOs);
+    }
+}
