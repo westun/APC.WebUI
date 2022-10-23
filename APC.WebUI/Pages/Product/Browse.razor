@@ -4,14 +4,20 @@
 
 <PageTitle>Browse products</PageTitle>
 
-<h1 class="mb-5">Browse Products</h1>
-
-@if (Products is null || !Products.Any())
+@if (Products is null)
 {
-    <Spinner/>
+    <div class="mt-10">
+        <Spinner/>  
+    </div>
 }
 else
 {
+    <h1 class="mb-5">Browse Products</h1>
+
+    <p>
+        There are <span class="text-primary"><strong>@Products.Count()</strong></span> Products
+    </p>
+
     <div class="clearfix">
         <div class="float-sm-start mb-3">
             <div class="card">
@@ -24,6 +30,14 @@ else
                             OnClickCallback="OnCategoryFilterClick">
                         </ProductCategoryCheckbox>
                     }
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body p-6">
+                    <h4>Paper Type</h4>
+                    <ProductRecycleCheckbox 
+                        RecycledFilter="RecycledFilter" 
+                        VirginFilter="VirginFilter"/>
                 </div>
             </div>
         </div>
@@ -39,12 +53,16 @@ else
 }
 
 @code {
-    private IEnumerable<ProductDTO> Products = new List<ProductDTO>();
+    private IEnumerable<ProductDTO> Products;
 
     private IEnumerable<ProductCategoryDTO> Categories = new List<ProductCategoryDTO>();
 
     //array allows mutability, it seems.
     private ProductCategoryCheckboxVM[] CategoryCheckboxVMs = new ProductCategoryCheckboxVM[0];
+
+    private bool RecycledFilter { get; set; } = true;
+    private bool VirginFilter { get; set; } = true;
+    private bool? HasSelectedRecycled { get; set; } //button Show me recycled products}
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -57,12 +75,17 @@ else
             {
                 Category = c,
             }).ToArray();
-            
+
             this.StateHasChanged();
         }
     }
 
     private async Task OnCategoryFilterClick(ProductCategoryCheckboxVM categoryCheckbox)
+    {
+        await this.RunFilters();
+    }
+
+    private async Task RunFilters()
     {
         var productsFromDB = await productService.GetAllProductsAsync();
 
