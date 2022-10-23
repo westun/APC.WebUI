@@ -23,10 +23,12 @@
         @if (Product.AreasOfApplications.Any())
         {
             <div class="mb-2 mt-2">
-                @foreach (var areasOfApplication in Product.AreasOfApplications)
-                {
-                    <div class="badge text-bg-light border me-1 mb-1">@areasOfApplication.Name</div>
-                }
+                <a href="admin/product/@Product.Id/areaofappliation">
+                    @foreach (var areasOfApplication in Product.AreasOfApplications)
+                    {
+                        <div class="badge text-bg-light border me-1 mb-1">@areasOfApplication.Name</div>
+                    }
+                </a>
             </div>
         }
         <div class="mt-2">

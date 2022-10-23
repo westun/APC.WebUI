@@ -1,0 +1,29 @@
+﻿<div class="alert alert-primary alert-dismissible fade show" role="alert">
+    <div class="mb-2">
+        The Areas Of Application were saved successfully.
+    </div>
+    <p>
+        <a href="admin/product/@Product.Id" class="btn btn-primary">
+            Return to Product Details
+        </a>
+    </p>
+    <p class="mb-0">
+        <a href="admin/product/list" class="btn btn-primary">
+            Return to Product List
+        </a>
+    </p>
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+            @onclick="OnDismissClickCallback">
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public ProductDTO Product { get; set; }
+
+    [Parameter]
+    public EventCallback OnDismissClickCallback { get; set; }
+}

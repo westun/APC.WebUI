@@ -1,32 +1,13 @@
 ﻿@page "/admin/product/{productid:int}/areaofappliation"
 @inject IProductService productService
 @inject IAreasOfApplicationService areasOfApplicationService
+@using APC.WebUI.Pages.Admin.Components
 
-<h3>Areas Of Application</h3>
+<h3>Product Areas Of Application</h3>
 
 @if (this.ShowSuccessAlert)
 {
-    <div class="alert alert-primary alert-dismissible fade show" role="alert">
-        <div class="mb-2">
-            The Areas Of Application were saved successfully.
-        </div>
-        <p>
-            <a href="admin/product/@Product.Id" class="btn btn-primary">
-                Return to Product Details
-            </a>
-        </p>
-        <p class="mb-0">
-            <a href="admin/product/list" class="btn btn-primary">
-                Return to Product List
-            </a>
-        </p>
-        <button type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-            @onclick="DismissSuccessAlert">
-        </button>
-    </div>
+    <AreasOfApplicationSuccessAlert Product="Product" OnDismissClickCallback="DismissSuccessAlert" />
 }
 
 @if (this.AreasOfApplicationVMs is null || this.SaveInProgress)
@@ -35,18 +16,18 @@
 }
 else
 {
-    <p class="mt-5">
-        Making changes for: <strong><span class="text-success">@Product.Name</span></strong>
-    </p>
     <div class="mb-5">
         Don't see what you're looking for?
         <div>
-            <a href="adminareasofapplication" class="btn btn-primary">
+            <a href="admin/areasofapplication" class="btn btn-primary">
                 Add a new Area Of Application
             </a>
         </div>
     </div>
-    <EditForm Model="AreasOfApplicationVMs" OnValidSubmit="OnValidSubmit">
+    <p class="mb-1">
+        Making changes for: <strong><span class="text-success">@Product.Name</span></strong>
+    </p>
+    <EditForm Model="AreasOfApplicationVMs" OnValidSubmit="OnSubmitForm">
         @foreach (var aoa in AreasOfApplicationVMs)
         {
             <div class="form-check form-switch">
@@ -103,7 +84,7 @@ else
         }
     }
 
-    private async Task OnValidSubmit(EditContext editContext)
+    private async Task OnSubmitForm(EditContext editContext)
     {
         this.SaveInProgress = true;
         this.StateHasChanged();
