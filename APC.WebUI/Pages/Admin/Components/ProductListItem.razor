@@ -23,7 +23,7 @@
         @if (Product.AreasOfApplications.Any())
         {
             <div class="mb-2 mt-2">
-                <a href="admin/product/@Product.Id/areaofappliation">
+                <a href="admin/product/@Product.Id/areasofapplication">
                     @foreach (var areasOfApplication in Product.AreasOfApplications)
                     {
                         <div class="badge text-bg-light border me-1 mb-1">@areasOfApplication.Name</div>
@@ -31,8 +31,24 @@
                 </a>
             </div>
         }
-        <div class="mt-2">
-            <a href="admin/product/@Product.Id" class="btn btn-primary">Make Changes</a>
+        
+        <div class="dropdown mt-2">
+            <button class="btn btn-primary @*dropdown-toggle*@" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                Make Changes
+                <span class="oi oi-arrow-thick-bottom"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li>
+                    <a class="dropdown-item" href="admin/product/@Product.Id">
+                        Product Details
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="admin/product/@Product.Id/areasofapplication">
+                        Areas Of Application
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
