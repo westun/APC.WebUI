@@ -6,6 +6,7 @@ namespace APC.WebUI.Services
     {
         Task<IEnumerable<AreasOfApplicationDTO>> GetAreasOfApplicationAsync();
         Task SaveProductAreasOfApplication(int productId, IEnumerable<AreasOfApplicationDTO> areasOfApplicationDTOs);
+        Task<AreasOfApplicationDTO> SaveAreasOfApplication(AreasOfApplicationDTO areasOfApplicationDTO);
 
     }
 }

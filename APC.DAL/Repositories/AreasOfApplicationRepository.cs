@@ -17,7 +17,7 @@ namespace APC.DAL.Repositories
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
 
-            return await dbContext.AreasOfApplication.ToListAsync();
+            return await dbContext.AreasOfApplication.OrderBy(a => a.Name).ToListAsync();
         }
 
         public async Task Save(int productId, IEnumerable<AreasOfApplication> areasOfApplications)
@@ -55,7 +55,22 @@ namespace APC.DAL.Repositories
                 product.AreasOfApplications.Add(aoaToAdd);
             }
 
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<AreasOfApplication> Save(AreasOfApplication areasOfApplication)
+        {
+            if (areasOfApplication is null)
+            {
+                throw new ArgumentNullException(nameof(areasOfApplication));
+            }
+
+            var dbContext = await this.dbContextFactory.CreateDbContextAsync();
+
+            dbContext.AreasOfApplication.Add(areasOfApplication);
+            await dbContext.SaveChangesAsync();
+
+            return areasOfApplication;
         }
     }
 }

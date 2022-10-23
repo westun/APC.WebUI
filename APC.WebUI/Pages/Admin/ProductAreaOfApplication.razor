@@ -4,17 +4,49 @@
 
 <h3>Areas Of Application</h3>
 
-@if (AreasOfApplicationVMs is null)
+@if (this.ShowSuccessAlert)
+{
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <div class="mb-2">
+            The Areas Of Application were saved successfully.
+        </div>
+        <p>
+            <a href="admin/product/@Product.Id" class="btn btn-primary">
+                Return to Product Details
+            </a>
+        </p>
+        <p class="mb-0">
+            <a href="admin/product/list" class="btn btn-primary">
+                Return to Product List
+            </a>
+        </p>
+        <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+            @onclick="DismissSuccessAlert">
+        </button>
+    </div>
+}
+
+@if (this.AreasOfApplicationVMs is null || this.SaveInProgress)
 {
     <Spinner></Spinner>
 }
 else
 {
     <p class="mt-5">
-        Make Changes for: <strong><span class="text-success">@Product.Name</span></strong>
+        Making changes for: <strong><span class="text-success">@Product.Name</span></strong>
     </p>
+    <div class="mb-5">
+        Don't see what you're looking for?
+        <div>
+            <a href="adminareasofapplication" class="btn btn-primary">
+                Add a new Area Of Application
+            </a>
+        </div>
+    </div>
     <EditForm Model="AreasOfApplicationVMs" OnValidSubmit="OnValidSubmit">
-
         @foreach (var aoa in AreasOfApplicationVMs)
         {
             <div class="form-check form-switch">
@@ -29,7 +61,11 @@ else
         }
 
         <div class="mt-3">
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-primary me-3">Save</button>
+            @if (this.SaveInProgress)
+            {
+                <span class="spinner-border text-success align-middle"></span>
+            }
             <a href="admin/product/list" class="btn btn-secondary">Cancel</a>
         </div>
     </EditForm>
@@ -43,6 +79,9 @@ else
 
     private IEnumerable<AreasOfApplicationDTO> AllAreasOfApplication {get;set;}
     private ProductDTO Product { get; set; }
+
+    private bool SaveInProgress { get; set; }
+    private bool ShowSuccessAlert { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -64,8 +103,11 @@ else
         }
     }
 
-    private void OnValidSubmit()
+    private async Task OnValidSubmit(EditContext editContext)
     {
+        this.SaveInProgress = true;
+        this.StateHasChanged();
+
         var updatedAreasOfApplicationDTOs = this.AreasOfApplicationVMs
             .Where(aoa => aoa.IsChecked)
             .Select(aoa => new AreasOfApplicationDTO
@@ -74,7 +116,21 @@ else
                 Name = aoa.Name,
             });
 
-        this.areasOfApplicationService
-            .SaveProductAreasOfApplication(this.ProductId, updatedAreasOfApplicationDTOs);
+        try
+        {
+            await this.areasOfApplicationService
+                .SaveProductAreasOfApplication(this.ProductId, updatedAreasOfApplicationDTOs);
+        }
+        finally
+        {
+            this.SaveInProgress = false;
+        }
+
+        this.ShowSuccessAlert = true;
+    }
+
+    private void DismissSuccessAlert()
+    {
+        this.ShowSuccessAlert = false;
     }
 }

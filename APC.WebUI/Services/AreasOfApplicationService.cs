@@ -43,5 +43,16 @@ namespace APC.WebUI.Services
 
             await this.areasOfApplicationRepository.Save(productId, areasOfApplication);
         }
+
+        public async Task<AreasOfApplicationDTO> SaveAreasOfApplication(AreasOfApplicationDTO areasOfApplicationDTO)
+        {
+            var areasOfApplication =
+                this.mapper.Map<AreasOfApplication>(areasOfApplicationDTO);
+
+            var areasOfApplicationFromDB = 
+                await this.areasOfApplicationRepository.Save(areasOfApplication);
+
+            return this.mapper.Map<AreasOfApplicationDTO>(areasOfApplicationFromDB);
+        }
     }
 }

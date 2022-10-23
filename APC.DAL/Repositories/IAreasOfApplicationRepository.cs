@@ -6,5 +6,6 @@ namespace APC.DAL.Repositories
     {
         Task<IEnumerable<AreasOfApplication>> GetAsync();
         Task Save(int productId, IEnumerable<AreasOfApplication> areasOfApplications);
+        Task<AreasOfApplication> Save(AreasOfApplication areasOfApplication);
     }
 }
