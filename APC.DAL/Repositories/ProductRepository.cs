@@ -63,6 +63,7 @@ namespace APC.DAL.Repositories
             existingProduct.CategoryId = product.CategoryId;
             existingProduct.TypeId = product.TypeId;
             existingProduct.ImageUrl = product.ImageUrl;
+            existingProduct.Recycled = product.Recycled;
 
             await dbContext.SaveChangesAsync();
 

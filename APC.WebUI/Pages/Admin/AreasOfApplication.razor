@@ -8,14 +8,14 @@
 else
 {
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-sm-6 mb-3">
             <h2>Add New Areas Of Application</h2>
             <EditForm Model="areasOfApplicationDTO" OnValidSubmit="OnNewAreasOfApplicationSubmit">
                 <DataAnnotationsValidator/>
                 <ValidationSummary/>
                 <div>
                     <label class="form-label">Name</label>
-                    <div class="col-lg-6 col-md-9 col-sm-12">
+                    <div class="col-lg-6 col-md-10 col-sm-12">
                         <InputText @bind-Value="areasOfApplicationDTO.Name" class="form-control"></InputText>
                     </div>
                 </div>
@@ -27,9 +27,8 @@ else
             </EditForm>
         </div>
 
-        <div class="col-md-6">
-
-        <h2>Areas of Application</h2>
+        <div class="col-sm-6">
+            <h2>Areas of Application</h2>
             <div>
                 @foreach (var areasOfApplication in areasOfApplicationDTOs)
                 {

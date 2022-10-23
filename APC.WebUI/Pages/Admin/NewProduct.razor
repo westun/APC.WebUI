@@ -73,6 +73,15 @@
                 </InputSelect>
             </div>
 
+            <div class="form-check mb-3 mt-3">
+                <InputCheckbox 
+                    @bind-Value="Product.Recycled" 
+                    class="form-check-input" 
+                    id="recycled"
+                    @onclick="OnReycledCheckboxClick" />
+                <label class="form-check-label" for="recycled">@RecycledLabelText</label>
+            </div>
+
             @if (this.AllowPhotoUpload)
             {
                 <div class="mb-4">
@@ -122,6 +131,11 @@
     private bool SaveInProgress { get; set; }
     private bool AllowPhotoUpload { get; set; } = true;
 
+    private string RecycledLabelText { get; set; }
+    private string RecycledLabelIsChecked = "This Product is Recycled";
+    private string RecycledLabelIsNotChecked = "This Product is NOT Recycled";
+
+
     private IBrowserFile SelectedFile { get; set; }
 
     protected async override Task OnInitializedAsync()
@@ -135,6 +149,10 @@
         }
 
         this.ProductCategories = await this.productCategoryService.GetProductCategoriesAsync();
+
+        this.RecycledLabelText = this.Product.Recycled
+            ? this.RecycledLabelIsChecked
+            : this.RecycledLabelIsNotChecked;
     }
 
     private async Task SaveProduct(EditContext editContext)
@@ -252,5 +270,18 @@
     private void OnChangePhotoClick()
     {
         this.AllowPhotoUpload = true;
+    }
+
+    private void OnReycledCheckboxClick()
+    {
+        //this.Product Recycled bool doesn't reflect checkbox selection in this event handler, so do opposite
+        if (!this.Product.Recycled)
+        {
+            this.RecycledLabelText = this.RecycledLabelIsChecked;
+        }
+        else
+        {
+            this.RecycledLabelText = this.RecycledLabelIsNotChecked;
+        }
     }
 }
