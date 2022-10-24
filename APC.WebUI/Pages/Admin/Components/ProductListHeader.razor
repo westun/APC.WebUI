@@ -1,5 +1,6 @@
 ﻿@using System.Reactive.Subjects
 @using System.Reactive.Linq;
+@implements IDisposable
 
 <EditForm Model="this" OnSubmit="OnSearchSubmit">
     <div class="container">
@@ -35,22 +36,28 @@
     private string searchCriteria { get; set; }
 
     private Subject<ChangeEventArgs> searchCriteriaSubject = new();
+    private IDisposable subscription { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        this.searchCriteriaSubject
+        this.subscription = this.searchCriteriaSubject
             .Throttle(TimeSpan.FromMilliseconds(1000))
             .Select(e => this.OnSearchInput(e))
             .Subscribe(async x => await InvokeAsync(StateHasChanged));
     }
 
-    public async Task OnSearchInput(ChangeEventArgs e)
+    private async Task OnSearchInput(ChangeEventArgs e)
     {
-       await this.SearchCallback.InvokeAsync(e.Value as string);
+        await this.SearchCallback.InvokeAsync(e.Value as string);
     }
 
-    public async Task OnSearchSubmit()
+    private async Task OnSearchSubmit()
     {
         await this.SearchCallback.InvokeAsync(this.searchCriteria);
+    }
+
+    public void Dispose()
+    {
+        this.subscription.Dispose();
     }
 }
