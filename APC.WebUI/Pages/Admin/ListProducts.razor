@@ -2,20 +2,20 @@
 @using APC.WebUI.Pages.Admin.Components;
 @inject IProductService productService
 
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <h3>Products List</h3>
-        </div>
-    </div>
-</div>
-
 @if (Products is null)
 {
     <Spinner/>
 }
 else
 {
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h3>Products List</h3>
+            </div>
+        </div>
+    </div>
+
     <ProductListHeader 
         ProductCount="this.Products.Count()"
         SearchCallback="OnSearch"/>
