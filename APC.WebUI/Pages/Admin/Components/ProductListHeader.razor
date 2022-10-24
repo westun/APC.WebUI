@@ -1,4 +1,7 @@
-﻿<EditForm Model="this" OnSubmit="OnSearchSubmit">
+﻿@using System.Reactive.Subjects
+@using System.Reactive.Linq;
+
+<EditForm Model="this" OnSubmit="OnSearchSubmit">
     <div class="container">
         <div class="row g-3 align-items-center">
             <div class="col-md-8">
@@ -8,8 +11,8 @@
             </div>
             <div class="col-lg-4 d-flex mb-5">
                 <div class="col-auto">
-                    <InputText @bind-Value="this.SearchCriteria"
-                               @oninput="((args) => OnSearchInput(args))"
+                    <InputText @bind-Value="this.searchCriteria"
+                               @oninput="searchCriteriaSubject.OnNext"
                                type="text"
                                class="form-control"
                                placeholder="Search" />
@@ -28,8 +31,18 @@
 
     [Parameter]
     public EventCallback<string> SearchCallback { get; set; }
-    
-    public string SearchCriteria { get; set; }
+
+    private string searchCriteria { get; set; }
+
+    private Subject<ChangeEventArgs> searchCriteriaSubject = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.searchCriteriaSubject
+            .Throttle(TimeSpan.FromMilliseconds(1000))
+            .Select(e => this.OnSearchInput(e))
+            .Subscribe(async x => await InvokeAsync(StateHasChanged));
+    }
 
     public async Task OnSearchInput(ChangeEventArgs e)
     {
@@ -38,6 +51,6 @@
 
     public async Task OnSearchSubmit()
     {
-        await this.SearchCallback.InvokeAsync(this.SearchCriteria);
+        await this.SearchCallback.InvokeAsync(this.searchCriteria);
     }
 }
