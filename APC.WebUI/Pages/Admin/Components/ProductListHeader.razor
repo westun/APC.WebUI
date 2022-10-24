@@ -42,7 +42,7 @@
     {
         this.subscription = this.searchCriteriaSubject
             .Throttle(TimeSpan.FromMilliseconds(1000))
-            .Select(e => this.OnSearchInput(e))
+            .Select(async e => await this.OnSearchInput(e))
             .Subscribe(async x => await InvokeAsync(StateHasChanged));
     }
 
