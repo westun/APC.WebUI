@@ -37,6 +37,20 @@ namespace APC.DAL.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Product>> Search(string criteria)
+        {
+            using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
+
+            if (string.IsNullOrWhiteSpace(criteria))
+            {
+                return await this.GetAsync();
+            }
+
+            var allProducts = await this.GetAsync();
+            
+            return allProducts.Where(p => p.Name.ToLower().Contains(criteria.ToLower()));
+        }
+
         public async Task<Product> Save(Product product)
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
