@@ -50,6 +50,8 @@ else
         {
             this.Products = (await productService.GetAllProductsAsync()).ToArray();
 
+            await InvokeAsync(StateHasChanged);
+
             return;
         }
 
@@ -59,5 +61,7 @@ else
         }
 
         this.Products = (await this.productService.Search(searchCriteria)).ToArray();
+
+        await InvokeAsync(StateHasChanged);
     }
 }
