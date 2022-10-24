@@ -6,5 +6,6 @@ namespace APC.WebUI.ViewModels
     {
         public ProductCategoryDTO Category { get; set; }
         public bool IsChecked { get; set; } = true;
+        public int ProductCount { get; set; }
     }
 }

@@ -72,6 +72,7 @@ else
             this.CategoryCheckboxVMs = this.Categories.Select(c => new ProductCategoryCheckboxVM
             {
                 Category = c,
+                ProductCount = this.Products.Where(p => p.Category.Name == c.Name).Count(),
             }).ToArray();
 
             this.StateHasChanged();
