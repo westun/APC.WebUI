@@ -1,5 +1,6 @@
 ﻿@page "/admin/attribute"
 @inject IProductAttributeService productAttributeService
+@inject IToastService toastService
 
 @if (productAttributeDTOs is null)
 {
@@ -62,6 +63,10 @@ else
 
         this.productAttributeDTOs =
             (await this.productAttributeService.GetProductAttributesAsync()).ToArray();
+
+        this.toastService.ShowSuccess(
+            message: $"Attribute ({this.productAttributeDTO.Name}) has been Saved Successfully.",
+            heading: "Success");
 
         this.ClearForm();
 

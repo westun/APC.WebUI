@@ -2,11 +2,11 @@ using APC.DAL.DataAccess;
 using APC.DAL.Repositories;
 using APC.WebUI.Models;
 using APC.WebUI.Services;
+using Blazored.Toast;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Logging;
@@ -84,6 +84,8 @@ namespace APC.WebUI
             builder.Services.AddAutoMapper(typeof(Program));
 
             builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddBlazoredToast();
 
             var app = builder.Build();
 
