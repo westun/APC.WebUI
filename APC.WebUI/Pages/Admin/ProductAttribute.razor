@@ -1,6 +1,8 @@
 ﻿@page "/admin/product/{productid:int}/attribute"
 @inject IProductService productService
 @inject IProductAttributeValueService productAttributeValueService
+@inject IProductAttributeService productAttributeService
+@inject IToastService toastService
 
 @if (this.productAttributeValueDTOs is null)
 {
@@ -9,24 +11,51 @@
 else
 {
     <div class="container">
-        <h3>Product Attributes</h3>
         <div class="row">
             <div class="col-sm-6">
+                <h3>Product Attributes</h3>
                 <EditForm Model="productAttributeValueDTOs" OnValidSubmit="OnProductAttributeSave" >
                     <DataAnnotationsValidator/>
                     <ValidationSummary/>
                     @foreach (var pav in this.productAttributeValueDTOs)
                     {
-                        <div>
+                        <div class="mb-2">
                             <label class="form-label">@pav.ProductAttribute.Name</label>
                             <InputText @bind-Value="pav.Value" class="form-control"/>
                         </div>
                     }
-                    <div class="mt-2">
+                    <div class="mt-2 mb-5">
                         <button type="submit" class="btn btn-primary me-2">Save</button>
-                        <button type="button" class="btn btn-secondary">Cancel</button>
+                        @if (this.SaveInProgress)
+                        {
+                            <span class="spinner-border text-success align-middle"></span>
+                        }
+                        <a href="admin/product/list" type="button" class="btn btn-secondary">
+                            Back to Product List
+                        </a>
                     </div>
                 </EditForm>
+            </div>
+            <div class="col-sm-6">
+                <h3>Add an Attribute</h3>
+                <div>
+                    @foreach (var productAttribute in productAttributeDTOs)
+                    {
+                        <p>
+                            <span class="oi oi-circle-check text-success"></span>
+                            @productAttribute.Name
+                            @{var attributeAlreadyAdded = this.productAttributeValueDTOs
+                                .Any(pav => pav.ProductAttribute.Id == productAttribute.Id);}
+                            @if (!attributeAlreadyAdded)
+                            {
+                                <button class="btn btn-primary btn-sm ms-3"
+                                    @onclick="() => AddAttribute(productAttribute)">
+                                    Add
+                                </button>
+                            }
+                        </p>
+                    }
+                </div>
             </div>
         </div>
     </div>
@@ -36,18 +65,40 @@ else
     [Parameter]
     public int ProductId { get; set; }
 
-    private IEnumerable<ProductAttributeValueDTO> productAttributeValueDTOs { get; set; }
+    private List<ProductAttributeValueDTO> productAttributeValueDTOs { get; set; }
+
+    private List<ProductAttributeDTO> productAttributeDTOs;
+
+    private bool SaveInProgress { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var product = await this.productService.GetProductByIdAsync(this.ProductId);
+        this.productAttributeValueDTOs = product.ProductAttributesValues.ToList();
 
-        this.productAttributeValueDTOs = product.ProductAttributesValues;
+        this.productAttributeDTOs =
+            (await this.productAttributeService.GetProductAttributesAsync()).ToList();
     }
 
     private async Task OnProductAttributeSave()
     {
+        this.SaveInProgress = true;
+
         await this.productAttributeValueService
             .SaveProductAttributeValues(this.ProductId, this.productAttributeValueDTOs);
+
+        this.toastService.ShowSuccess(
+            message: $"The Product Attributes have been Saved Successfully.",
+            heading: "Success");
+
+        this.SaveInProgress = false;
+    }
+
+    private void AddAttribute(ProductAttributeDTO productAttribute)
+    {
+        this.productAttributeValueDTOs.Add(new ProductAttributeValueDTO
+        {
+            ProductAttribute = productAttribute,
+        });
     }
 }
