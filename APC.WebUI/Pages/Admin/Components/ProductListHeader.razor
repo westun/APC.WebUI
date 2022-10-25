@@ -20,6 +20,10 @@
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary">Search</button>
+                    @if (this.SearchIsRunning)
+                    {
+                        <span class="spinner-border text-success align-middle"></span>
+                    }
                 </div>
             </div>
         </div>
@@ -38,12 +42,24 @@
     private Subject<ChangeEventArgs> searchCriteriaSubject = new();
     private IDisposable subscription { get; set; }
 
+    private bool SearchIsRunning { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         this.subscription = this.searchCriteriaSubject
+            .Select(e => {
+                if ((e.Value as string).Length > 2 || (e.Value as string) == string.Empty)
+                {
+                    this.SearchIsRunning = true;
+                }
+                return e;
+            })
             .Throttle(TimeSpan.FromMilliseconds(1000))
             .Select(async e => await this.OnSearchInput(e))
-            .Subscribe(async x => await InvokeAsync(StateHasChanged));
+            .Subscribe(async x => {
+                this.SearchIsRunning = false;
+                await InvokeAsync(StateHasChanged);
+            });
     }
 
     private async Task OnSearchInput(ChangeEventArgs e)
