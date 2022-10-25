@@ -5,5 +5,6 @@ namespace APC.WebUI.Services
     public interface IProductTypeService
     {
         Task<IEnumerable<ProductTypeDTO>> GetProductTypesAsync();
+        Task<ProductTypeDTO> SaveProductType(ProductTypeDTO productTypeDTO);
     }
 }

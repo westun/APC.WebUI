@@ -20,5 +20,24 @@ namespace APC.DAL.Repositories
                 .Include(pt => pt.Category)
                 .ToListAsync();
         }
+
+        public async Task<ProductType> Save(ProductType productType)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            var productTypeFromDB = dbContext.ProductTypes.FirstOrDefault(pt => pt.Id == productType.Id);
+            if (productTypeFromDB is null)
+            {
+                dbContext.ProductTypes.Add(productType);
+                dbContext.SaveChanges();
+
+                return productType;
+            }
+
+            //update existing product type
+            throw new NotImplementedException();
+
+            return productType;
+        }   
     }
 }
