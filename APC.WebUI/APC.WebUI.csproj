@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.14.0" />
+    <PackageReference Include="Blazored.Toast" Version="3.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" NoWarn="NU1605" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.8" NoWarn="NU1605" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.9">

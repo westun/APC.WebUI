@@ -1,5 +1,6 @@
 ﻿@page "/admin/areasofapplication"
 @inject IAreasOfApplicationService areasOfApplicationService
+@inject IToastService toastService
 
 @if (this.areasOfApplicationDTOs is null)
 {
@@ -66,6 +67,10 @@ else
 
         this.areasOfApplicationDTOs =
                 await areasOfApplicationService.GetAreasOfApplicationAsync();
+
+        this.toastService.ShowSuccess(
+            message: $"Areas of Application ({areasOfApplication.Name}) has been Saved Successfully.",
+            heading: "Success");
 
         this.ClearForm();
 
