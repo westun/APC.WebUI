@@ -14,6 +14,9 @@ else
         <div class="row">
             <div class="col-sm-6">
                 <h3>Product Attributes</h3>
+                <p class="mb-1">
+                    Making changes for: <strong><span class="text-success">@product.Name</span></strong>
+                </p>
                 <EditForm Model="productAttributeValueDTOs" OnValidSubmit="OnProductAttributeSave" >
                     <DataAnnotationsValidator/>
                     <ValidationSummary/>
@@ -69,15 +72,17 @@ else
 
     private List<ProductAttributeValueDTO> productAttributeValueDTOs { get; set; }
 
-    private List<ProductAttributeDTO> productAttributeDTOs;
+    private List<ProductAttributeDTO> productAttributeDTOs { get; set; }
+
+    private ProductDTO product { get; set; }
 
     private bool SaveInProgress { get; set; }
     private string CustomErrorMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var product = await this.productService.GetProductByIdAsync(this.ProductId);
-        this.productAttributeValueDTOs = product.ProductAttributesValues.ToList();
+        this.product = await this.productService.GetProductByIdAsync(this.ProductId);
+        this.productAttributeValueDTOs = this.product.ProductAttributesValues.ToList();
 
         this.productAttributeDTOs =
             (await this.productAttributeService.GetProductAttributesAsync()).ToList();
