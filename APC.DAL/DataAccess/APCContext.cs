@@ -31,6 +31,7 @@ namespace APC.DAL.DataAccess
         public DbSet<ProductType> ProductTypes { get; set; }
         public DbSet<AreasOfApplication> AreasOfApplication { get; set; }
         public DbSet<ProductAttribute> ProductAttribute { get; set; }
+        public DbSet<ProductAttributeValue> ProductAttributeValue { get; set; }
         public DbSet<SimilarProducts> SimilarProducts { get; set; }
         public DbSet<Account> Account { get; set; }
 

@@ -76,6 +76,10 @@ namespace APC.WebUI
             builder.Services.AddTransient<ISimilarProductsService, SimilarProductsService>();
             builder.Services.AddTransient<IAreasOfApplicationRepository, AreasOfApplicationRepository>();
             builder.Services.AddTransient<IAreasOfApplicationService, AreasOfApplicationService>();
+            builder.Services.AddTransient<IProductAttributeValueRepository, ProductAttributeValueRepository>();
+            builder.Services.AddTransient<IProductAttributeValueService, ProductAttributeValueService>();
+            builder.Services.AddTransient<IProductAttributeRepository, ProductAttributeRepository>();
+            builder.Services.AddTransient<IProductAttributeService, ProductAttributeService>();
 
             builder.Services.AddAutoMapper(typeof(Program));
 

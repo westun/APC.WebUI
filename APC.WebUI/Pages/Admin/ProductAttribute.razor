@@ -1,0 +1,53 @@
+﻿@page "/admin/product/{productid:int}/attribute"
+@inject IProductService productService
+@inject IProductAttributeValueService productAttributeValueService
+
+@if (this.productAttributeValueDTOs is null)
+{
+    <Spinner/>
+}
+else
+{
+    <div class="container">
+        <h3>Product Attributes</h3>
+        <div class="row">
+            <div class="col-sm-6">
+                <EditForm Model="productAttributeValueDTOs" OnValidSubmit="OnProductAttributeSave" >
+                    <DataAnnotationsValidator/>
+                    <ValidationSummary/>
+                    @foreach (var pav in this.productAttributeValueDTOs)
+                    {
+                        <div>
+                            <label class="form-label">@pav.ProductAttribute.Name</label>
+                            <InputText @bind-Value="pav.Value" class="form-control"/>
+                        </div>
+                    }
+                    <div class="mt-2">
+                        <button type="submit" class="btn btn-primary me-2">Save</button>
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private IEnumerable<ProductAttributeValueDTO> productAttributeValueDTOs { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var product = await this.productService.GetProductByIdAsync(this.ProductId);
+
+        this.productAttributeValueDTOs = product.ProductAttributesValues;
+    }
+
+    private async Task OnProductAttributeSave()
+    {
+        await this.productAttributeValueService
+            .SaveProductAttributeValues(this.ProductId, this.productAttributeValueDTOs);
+    }
+}
