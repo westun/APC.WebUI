@@ -1,5 +1,6 @@
 using APC.DAL.DataAccess;
 using APC.DAL.Repositories;
+using APC.WebUI.Configuration;
 using APC.WebUI.Models;
 using APC.WebUI.Services;
 using Blazored.Toast;
@@ -59,38 +60,16 @@ namespace APC.WebUI
             builder.Services.AddDbContextFactory<APCContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
 
-            //scoped service isn't ideal for blazor apps
-            //builder.Services.AddDbContext<APCContext>(options =>
-            //{
-            //    options.UseSqlServer();
-            //});
-
-            builder.Services.AddTransient<IProductRepository, ProductRepository>();
-            builder.Services.AddTransient<IProductService, ProductService>();
-            builder.Services.AddTransient<IProductCategoryRepository, ProductCategoryRepository>();
-            builder.Services.AddTransient<IProductCategoryService, ProductCategoryService>();
-            builder.Services.AddTransient<IProductTypeRepository, ProductTypeRepository>();
-            builder.Services.AddTransient<IProductTypeService, ProductTypeService>();
-            builder.Services.AddTransient<IFileUploadService, AzureBlobFileUploadService>();
-            builder.Services.AddTransient<ISimilarProductsRepository, SimilarProductsRepository>();
-            builder.Services.AddTransient<ISimilarProductsService, SimilarProductsService>();
-            builder.Services.AddTransient<IAreasOfApplicationRepository, AreasOfApplicationRepository>();
-            builder.Services.AddTransient<IAreasOfApplicationService, AreasOfApplicationService>();
-            builder.Services.AddTransient<IProductAttributeValueRepository, ProductAttributeValueRepository>();
-            builder.Services.AddTransient<IProductAttributeValueService, ProductAttributeValueService>();
-            builder.Services.AddTransient<IProductAttributeRepository, ProductAttributeRepository>();
-            builder.Services.AddTransient<IProductAttributeService, ProductAttributeService>();
-
-            builder.Services.AddAutoMapper(typeof(Program));
-
             builder.Services.AddHttpContextAccessor();
+            
+            builder.Services.AddAutoMapper(typeof(Program));
 
             builder.Services.AddBlazoredToast();
 
-            var app = builder.Build();
+            builder.Services.AddDalRepositories();
+            builder.Services.AddDalServices();
 
-            //wheeee...
-            var apcContext = app.Services.GetService<IDbContextFactory<APCContext>>();
+            var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
