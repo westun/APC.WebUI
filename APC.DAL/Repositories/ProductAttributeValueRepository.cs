@@ -23,24 +23,6 @@ namespace APC.DAL.Repositories
 
             product.ProductAttributesValues = productAttributeValues.ToList();
 
-            //var dbIds = product.ProductAttributesValues.Select(aoa => aoa.Id).ToArray();
-            //var selectedIds = productAttributeValues.Select(aoa => aoa.Id).ToArray();
-            //var ignoreIntersectIds = dbIds.Intersect(selectedIds).ToArray();
-
-            //var removeExceptIds = dbIds.Except(selectedIds).ToArray();
-            //foreach (var aoaId in removeExceptIds)
-            //{
-            //    var pavToRemove = product.ProductAttributesValues.FirstOrDefault(aoa => aoa.Id == aoaId);
-            //    product.ProductAttributesValues.Remove(pavToRemove);
-            //}
-
-            //var addExceptIds = selectedIds.Except(dbIds).ToArray();
-            //foreach (var aoaId in addExceptIds)
-            //{
-            //    var pavToAdd = productAttributeValues.FirstOrDefault(aoa => aoa.Id == aoaId);
-            //    product.ProductAttributesValues.Add(pavToAdd);
-            //}
-            
             await dbContext.SaveChangesAsync();
         }
     }
