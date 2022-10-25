@@ -1,0 +1,79 @@
+﻿@using System.Reactive.Subjects
+@using System.Reactive.Linq;
+@implements IDisposable
+
+<EditForm Model="this" OnSubmit="OnSearchSubmit">
+    <div class="container">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-8">
+                <p>
+                    There are <span class="text-primary">@ProductCount</span> Products
+                </p>
+            </div>
+            <div class="col-lg-4 d-flex mb-5">
+                <div class="col-auto">
+                    <InputText @bind-Value="this.searchCriteria"
+                               @oninput="searchCriteriaSubject.OnNext"
+                               type="text"
+                               class="form-control"
+                               placeholder="Search" />
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    @if (this.SearchIsRunning)
+                    {
+                        <span class="spinner-border text-success align-middle"></span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int ProductCount { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SearchCallback { get; set; }
+
+    private string searchCriteria { get; set; }
+
+    private Subject<ChangeEventArgs> searchCriteriaSubject = new();
+    private IDisposable subscription { get; set; }
+
+    private bool SearchIsRunning { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.subscription = this.searchCriteriaSubject
+            .Select(e => {
+                if ((e.Value as string).Length > 2 || (e.Value as string) == string.Empty)
+                {
+                    this.SearchIsRunning = true;
+                }
+                return e;
+            })
+            .Throttle(TimeSpan.FromMilliseconds(1000))
+            .Select(async e => await this.OnSearchInput(e))
+            .Subscribe(async x => {
+                this.SearchIsRunning = false;
+                await InvokeAsync(StateHasChanged);
+            });
+    }
+
+    private async Task OnSearchInput(ChangeEventArgs e)
+    {
+        await this.SearchCallback.InvokeAsync(e.Value as string);
+    }
+
+    private async Task OnSearchSubmit()
+    {
+        await this.SearchCallback.InvokeAsync(this.searchCriteria);
+    }
+
+    public void Dispose()
+    {
+        this.subscription.Dispose();
+    }
+}

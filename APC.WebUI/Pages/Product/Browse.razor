@@ -1,9 +1,100 @@
 ﻿@page "/products/browse"
+@inject IProductService productService
+@inject IProductCategoryService productCategoryService
 
 <PageTitle>Browse products</PageTitle>
 
-<h1>Browse Products</h1>
+@if (Products is null)
+{
+    <Spinner/>  
+}
+else
+{
+    <h1 class="mb-5">Browse Products</h1>
+
+    <p>
+        There are <span class="text-primary"><strong>@Products.Count()</strong></span> Products
+    </p>
+
+    <div class="clearfix">
+        <div class="float-sm-start mb-3">
+            <div class="card">
+                <div class="card-body p-6">
+                    <h4>Categories</h4>
+                    @for (int i = 0; i < this.CategoryCheckboxVMs.Count(); i++)
+                    {
+                        <ProductCategoryCheckbox 
+                            CategoryCheckboxVM="this.CategoryCheckboxVMs[i]"
+                            OnClickCallback="OnCategoryFilterClick">
+                        </ProductCategoryCheckbox>
+                    }
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body p-6">
+                    <h4>Paper Type</h4>
+                    <ProductRecycleCheckbox 
+                        RecycledFilter="RecycledFilter" 
+                        VirginFilter="VirginFilter"/>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex row">
+            @foreach (var product in this.Products)
+            {
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <ProductItemDisplay Product="product" />
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @code {
+    private IEnumerable<ProductDTO> Products;
 
+    private IEnumerable<ProductCategoryDTO> Categories = new List<ProductCategoryDTO>();
+
+    //array allows mutability, it seems.
+    private ProductCategoryCheckboxVM[] CategoryCheckboxVMs = new ProductCategoryCheckboxVM[0];
+
+    private bool RecycledFilter { get; set; } = true;
+    private bool VirginFilter { get; set; } = true;
+    private bool? HasSelectedRecycled { get; set; } //button Show me recycled products}
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            this.Products = await productService.GetAllProductsAsync();
+            this.Categories = await productCategoryService.GetProductCategoriesAsync();
+
+            this.CategoryCheckboxVMs = this.Categories.Select(c => new ProductCategoryCheckboxVM
+            {
+                Category = c,
+                ProductCount = this.Products.Where(p => p.Category.Name == c.Name).Count(),
+            }).ToArray();
+
+            this.StateHasChanged();
+        }
+    }
+
+    private async Task OnCategoryFilterClick(ProductCategoryCheckboxVM categoryCheckbox)
+    {
+        await this.RunFilters();
+    }
+
+    private async Task RunFilters()
+    {
+        var productsFromDB = await productService.GetAllProductsAsync();
+
+        int[] selectedIds = this.CategoryCheckboxVMs
+                .Where(p => p.IsChecked)
+                .Select(p => p.Category.Id)
+                .ToArray();
+
+        this.Products = productsFromDB
+            .Where(p => selectedIds.Contains(p.CategoryId))
+            .ToList();
+    }
 }

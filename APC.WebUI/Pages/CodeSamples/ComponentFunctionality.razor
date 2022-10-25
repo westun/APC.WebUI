@@ -1,0 +1,20 @@
+﻿<h3>ComponentFunctionality</h3>
+
+@code {
+    //will be populated by text inside html tags ie: <div>My Render <em>Fragment</em content</div>
+    [Parameter]
+    public RenderFragment RenderFragmentContent { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await this.WriteToBrowserConsole();
+        }
+    }
+
+    private async Task WriteToBrowserConsole()
+    {
+        await Task.FromResult(() => Console.WriteLine("I'm writing to the browser console"));
+    }
+}

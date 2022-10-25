@@ -1,0 +1,13 @@
+﻿@foreach (var attributeValue in ProductAttributeValues)
+{
+    <p>
+        <span class="oi oi-circle-check text-success"></span> 
+        <strong>@attributeValue.ProductAttribute.Name:</strong>
+        @attributeValue.Value
+    </p>
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<ProductAttributeValueDTO> ProductAttributeValues { get; set; }
+}

@@ -1,0 +1,52 @@
+﻿@page "/products/detail"
+@page "/products/detail/{id:int}"
+@inject IProductService productService
+@inject ISimilarProductsService similarProductService
+
+<h1>Product Detail</h1>
+
+@if (Product is null)
+{
+    <Spinner/>
+}
+else
+{
+    <h2 class="mt-3">@Product.DisplayName</h2>
+    <div class="well p-3 mb-2 clearfix">
+        <div class="float-start">
+            <img src="@Product.ImageUrl">
+        </div>
+        <div class="float-start ms-3">
+            <h2>@Product.Name</h2>
+            <ProductAttributeDisplay ProductAttributeValues="Product.ProductAttributesValues"></ProductAttributeDisplay>
+            <button href="#" class="btn btn-primary btn-lg">Add to Cart</button>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <h2>Areas of Application</h2>
+        <AreasOfApplicationDisplay AreasOfApplications="Product.AreasOfApplications"></AreasOfApplicationDisplay>
+    </div>
+
+    if (SimilarProducts is not null && SimilarProducts.Any())
+    {
+        <div class="mb-5">
+            <h2>Similar Items</h2>
+            <SimilarProductsDisplay SimilarProducts="SimilarProducts" />
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ProductDTO Product { get; set; }
+    private IEnumerable<SimilarProductsDTO> SimilarProducts { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        this.Product = await productService.GetProductByIdAsync(this.Id);
+        this.SimilarProducts = await similarProductService.GetSimilarProductsByProductIdAsync(this.Id);
+    }
+}

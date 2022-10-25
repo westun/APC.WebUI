@@ -1,9 +1,26 @@
-﻿<AuthorizeView>
+﻿
+
+<AuthorizeView>
     <Authorized>
-        Hello, @context.User.Identity?.Name!
-        <a href="MicrosoftIdentity/Account/SignOut">Log out</a>
+        <span class="text-light">Hello, @UserName | </span>
+        <a href="MicrosoftIdentity/Account/SignOut" class="text-light">Log out</a>
     </Authorized>
     <NotAuthorized>
-        <a href="MicrosoftIdentity/Account/SignIn">Log in</a>
+        <a href="MicrosoftIdentity/Account/SignIn" class="text-light">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
+
+@inject IHttpContextAccessor httpContextAccessor
+
+@code{
+    public string UserName { get; set; } = "John Doe";
+
+    protected override void OnInitialized()
+    {
+        if (this.httpContextAccessor.HttpContext != null)
+        {
+            var user = this.httpContextAccessor.HttpContext.User;
+            UserName = user.Identity?.Name! ?? "John Doe";
+        }
+    }
+}

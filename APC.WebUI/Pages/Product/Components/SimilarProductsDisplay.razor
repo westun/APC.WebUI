@@ -1,0 +1,18 @@
+﻿@foreach (var product in SimilarProducts)
+{
+    <ul class="ps-0">
+        <li>
+            <span class="oi oi-circle-check text-success"></span>
+            <a 
+                class="text-success" 
+                href="products/detail/@product.SimiliarProduct.Id">
+                @product.SimiliarProduct.Name - @product.SimiliarProduct.Type?.Name
+            </a>
+        </li>
+    </ul>
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<SimilarProductsDTO> SimilarProducts { get; set; }
+}

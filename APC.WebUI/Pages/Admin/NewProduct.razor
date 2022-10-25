@@ -1,0 +1,287 @@
+﻿@page "/admin/product/new"
+@page "/admin/product/{productId:int}"
+@using APC.WebUI.Pages.Admin.Components;
+
+@inject IProductService productService
+@inject IProductCategoryService productCategoryService
+@inject IProductTypeService productTypeService
+@inject IFileUploadService fileUploadService
+
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            @if (Product.Id > 0)
+            {
+                <h1>Modify Product</h1>
+            }
+            else
+            {
+                <h1>Add New Product</h1>
+            }
+        </div>
+    </div>
+</div>
+
+@if (ShowSuccessAlert)
+{
+    <ProductSavedSuccessAlert 
+        Product="this.CreatedProduct" 
+        OnDismissClickCallback="DismissSuccessAlert" />
+}
+
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-sm-6">
+        <EditForm Model="@Product" OnValidSubmit="@SaveProduct">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            @*Custom error message for select controls that don't validate properly*@
+            <ul class="validation-message">@((MarkupString)CustomErrorMessage)</ul>
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Product Name</label>
+                <InputText @bind-Value="Product.Name" id="name" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label for="displayname" class="form-label">Display Name</label>
+                <InputText @bind-Value="Product.DisplayName" class="form-control"/>
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <InputSelect 
+                    Value="Product.CategoryId"
+                    ValueExpression="(() => Product.CategoryId)"
+                    ValueChanged="@((int args) => { Product.CategoryId = args; OnProductCategoryChange(args); })"
+                    id="category" 
+                    class="form-select"
+                    >
+                    <option value=""></option>
+                    @foreach (var category in ProductCategories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label for="type" class="form-label">Type</label>
+                <InputSelect @bind-Value="Product.TypeId" id="type" class="form-select">
+                    <option></option>
+                    @foreach (var type in ProductTypes)
+                    {
+                        <option value="@type.Id">@type.Name</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="form-check mb-3 mt-3">
+                <InputCheckbox 
+                    @bind-Value="Product.Recycled" 
+                    class="form-check-input" 
+                    id="recycled"
+                    @onclick="OnReycledCheckboxClick" />
+                <label class="form-check-label" for="recycled">@RecycledLabelText</label>
+            </div>
+
+            @if (this.AllowPhotoUpload)
+            {
+                <div class="mb-4">
+                    <label for="type" class="form-label">Product Image</label>
+                    <InputFile OnChange="OnPhotoUploadChange" class="form-control"></InputFile>
+                </div>
+            }
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary me-2">Save</button>
+                @if (this.SaveInProgress)
+                {
+                    <span class="spinner-border text-success align-middle"></span>
+                }
+                <a href="admin/product/list" class="btn btn-secondary ms-3">Cancel</a>
+            </div>
+        </EditForm>
+    </div>
+
+    @if (Product.Id > 0)
+    {
+        <div class="col-sm-6">
+            <h2>Product Photo</h2>
+            <img src="@Product.ImageUrl" />
+            @if (!AllowPhotoUpload)
+            {
+                <p>
+                    <button type="button" class="btn btn-primary" @onclick="OnChangePhotoClick">Change Photo</button>
+                </p>
+            }
+        </div>
+    }
+</div>
+</div>
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private ProductDTO Product { get; set; } = new ProductDTO();
+    private ProductDTO CreatedProduct { get; set; } = new ProductDTO();
+
+    private IEnumerable<ProductCategoryDTO> ProductCategories { get; set; } = new List<ProductCategoryDTO>();
+    private IEnumerable<ProductTypeDTO> ProductTypes { get; set; } = new List<ProductTypeDTO>();
+
+    private string CustomErrorMessage { get; set; }
+    private bool ShowSuccessAlert { get; set; }
+    private bool SaveInProgress { get; set; }
+    private bool AllowPhotoUpload { get; set; } = true;
+
+    private string RecycledLabelText { get; set; }
+    private string RecycledLabelIsChecked = "This Product is Recycled";
+    private string RecycledLabelIsNotChecked = "This Product is NOT Recycled";
+
+
+    private IBrowserFile SelectedFile { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var isEditing = this.ProductId > 0;
+        if (isEditing)
+        {
+            this.Product = await this.productService.GetProductByIdAsync(this.ProductId);
+            await this.OnProductCategoryChange(this.Product.Category.Id);
+            this.AllowPhotoUpload = false;
+        }
+
+        this.ProductCategories = await this.productCategoryService.GetProductCategoriesAsync();
+
+        this.RecycledLabelText = this.Product.Recycled
+            ? this.RecycledLabelIsChecked
+            : this.RecycledLabelIsNotChecked;
+    }
+
+    private async Task SaveProduct(EditContext editContext)
+    {
+        this.CustomErrorMessage = null;
+
+        if (!IsFormValid())
+        {
+            return;
+        }
+
+        this.SaveInProgress = true;
+
+        try
+        {
+            @if (AllowPhotoUpload)
+            {
+                var fileUploadData = new FileUploadDataDTO
+                {
+                    FileName = this.GetUniqueFileName(this.SelectedFile.Name),
+                    BrowserFile = this.SelectedFile,
+                };
+                var fileUploadResult = await this.fileUploadService.UploadFile(fileUploadData);
+                this.Product.ImageUrl = fileUploadResult.FileUrl.ToString();
+            }
+
+            var product = await this.productService.Save(this.Product);
+            this.Product.Id = product.Id;
+            this.CreatedProduct = product;
+        }
+        finally 
+        {
+            this.SaveInProgress = false;
+        }
+
+        this.ShowSuccessAlert = true;
+
+        this.ClearForm();
+    }
+
+    private string GetUniqueFileName(string originalFileName)
+    {
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        var fileExtension = Path.GetExtension(originalFileName);
+
+        Random random = new Random();
+        int randomId = random.Next(1000, 99999);
+
+        return $"{nameWithoutExtension}_{randomId}{fileExtension}";
+    }
+
+    private bool IsFormValid()
+    {
+        //form doesn't recognize these fields are required, unless you select a value, then unselect
+        bool isValid;
+        if (this.Product.CategoryId <= 0)
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Category is required. </li>";
+        }
+        else
+        {
+            isValid = true;
+        }
+
+        if (this.Product.TypeId <= 0)
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Type is required. </li>";
+        }
+        else
+        {
+            isValid = true;
+        }
+
+        @if (this.SelectedFile is null && this.AllowPhotoUpload)
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Photo Upload is required. </li>";
+        }
+        else
+        {
+            isValid = true;
+        }
+
+        return isValid;
+    }
+
+    private void ClearForm()
+    {
+        this.Product = new ProductDTO();
+        this.SelectedFile = null;
+        this.AllowPhotoUpload = true;
+    }
+
+    private void DismissSuccessAlert()
+    {
+        this.ShowSuccessAlert = false;
+    }
+
+    private void OnPhotoUploadChange(InputFileChangeEventArgs e)
+    {
+        this.SelectedFile = e.File;
+        this.StateHasChanged();
+    }
+
+    private async Task OnProductCategoryChange(int selectedCategoryID)
+    {
+        var typesFromDB = await this.productTypeService.GetProductTypesAsync();
+        this.ProductTypes = typesFromDB.Where(t => t.CategoryId == selectedCategoryID);
+
+        this.StateHasChanged();
+    }
+
+    private void OnChangePhotoClick()
+    {
+        this.AllowPhotoUpload = true;
+    }
+
+    private void OnReycledCheckboxClick()
+    {
+        //this.Product Recycled bool doesn't reflect checkbox selection in this event handler, so do opposite
+        if (!this.Product.Recycled)
+        {
+            this.RecycledLabelText = this.RecycledLabelIsChecked;
+        }
+        else
+        {
+            this.RecycledLabelText = this.RecycledLabelIsNotChecked;
+        }
+    }
+}

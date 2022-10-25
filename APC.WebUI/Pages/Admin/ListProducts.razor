@@ -1,0 +1,67 @@
+﻿@page "/admin/product/list"
+@using APC.WebUI.Pages.Admin.Components;
+@inject IProductService productService
+
+@if (Products is null)
+{
+    <Spinner/>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h3>Products List</h3>
+            </div>
+        </div>
+    </div>
+
+    <ProductListHeader 
+        ProductCount="this.Products.Count()"
+        SearchCallback="OnSearch"/>
+
+    <div class="container">
+        <div class="row row-cols-1 row-cols-lg-4 row-cols-md-3 g-4 g-lg-4">
+            @foreach (var product in Products)
+            {
+                <div class="col">
+                    <ProductListItem Product="product" />
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private ProductDTO[] Products { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            this.Products = (await productService.GetAllProductsAsync()).ToArray();
+            this.StateHasChanged();
+        }
+    }
+
+    private async Task OnSearch(string searchCriteria)
+    {
+        if (string.IsNullOrWhiteSpace(searchCriteria))
+        {
+            this.Products = (await productService.GetAllProductsAsync()).ToArray();
+
+            await InvokeAsync(StateHasChanged);
+
+            return;
+        }
+
+        if (searchCriteria.Length <= 2)
+        {
+            return;
+        }
+
+        this.Products = (await this.productService.Search(searchCriteria)).ToArray();
+
+        await InvokeAsync(StateHasChanged);
+    }
+}

@@ -1,0 +1,117 @@
+﻿@page "/admin/product/{productid:int}/areasofapplication"
+@inject IProductService productService
+@inject IAreasOfApplicationService areasOfApplicationService
+@using APC.WebUI.Pages.Admin.Components
+
+<h3>Product Areas Of Application</h3>
+
+@if (this.ShowSuccessAlert)
+{
+    <AreasOfApplicationSuccessAlert Product="Product" OnDismissClickCallback="DismissSuccessAlert" />
+}
+
+@if (this.AreasOfApplicationVMs is null || this.SaveInProgress)
+{
+    <Spinner></Spinner>
+}
+else
+{
+    <div class="mb-5">
+        Don't see what you're looking for?
+        <div>
+            <a href="admin/areasofapplication" class="btn btn-primary">
+                Add a new Area Of Application
+            </a>
+        </div>
+    </div>
+    <p class="mb-1">
+        Making changes for: <strong><span class="text-success">@Product.Name</span></strong>
+    </p>
+    <EditForm Model="AreasOfApplicationVMs" OnValidSubmit="OnSubmitForm">
+        @foreach (var aoa in AreasOfApplicationVMs)
+        {
+            <div class="form-check form-switch">
+                <InputCheckbox 
+                    @bind-Value="@aoa.IsChecked"
+                    id="@aoa.Id"
+                    class="form-check-input" />
+                <label class="form-check-label" for="@aoa.Id">
+                    @aoa.Name
+                </label>
+            </div>
+        }
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary me-3">Save</button>
+            @if (this.SaveInProgress)
+            {
+                <span class="spinner-border text-success align-middle"></span>
+            }
+            <a href="admin/product/list" class="btn btn-secondary">Cancel</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private AreasOfApplicationVM[] AreasOfApplicationVMs { get; set; }
+
+    private IEnumerable<AreasOfApplicationDTO> AllAreasOfApplication {get;set;}
+    private ProductDTO Product { get; set; }
+
+    private bool SaveInProgress { get; set; }
+    private bool ShowSuccessAlert { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            this.Product = await this.productService.GetProductByIdAsync(this.ProductId);
+            var selectedIds = this.Product.AreasOfApplications.Select(aoa => aoa.Id).ToArray();
+
+            this.AllAreasOfApplication = await this.areasOfApplicationService.GetAreasOfApplicationAsync();
+
+            this.AreasOfApplicationVMs = this.AllAreasOfApplication.Select(aoa => new AreasOfApplicationVM
+            {
+                Id = aoa.Id,
+                Name = aoa.Name,
+                IsChecked = selectedIds.Contains(aoa.Id),
+            }).ToArray();
+
+            this.StateHasChanged();
+        }
+    }
+
+    private async Task OnSubmitForm(EditContext editContext)
+    {
+        this.SaveInProgress = true;
+        this.StateHasChanged();
+
+        var updatedAreasOfApplicationDTOs = this.AreasOfApplicationVMs
+            .Where(aoa => aoa.IsChecked)
+            .Select(aoa => new AreasOfApplicationDTO
+            { 
+                Id = aoa.Id,
+                Name = aoa.Name,
+            });
+
+        try
+        {
+            await this.areasOfApplicationService
+                .SaveProductAreasOfApplication(this.ProductId, updatedAreasOfApplicationDTOs);
+        }
+        finally
+        {
+            this.SaveInProgress = false;
+        }
+
+        this.ShowSuccessAlert = true;
+    }
+
+    private void DismissSuccessAlert()
+    {
+        this.ShowSuccessAlert = false;
+    }
+}

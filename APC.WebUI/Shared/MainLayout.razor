@@ -1,20 +1,19 @@
 ﻿@inherits LayoutComponentBase
+@using Blazored.Toast.Configuration
 
-<PageTitle>APC.WebUI</PageTitle>
+<PageTitle>APC</PageTitle>
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
     <main>
-        <div class="top-row px-4 auth">
-            <LoginDisplay />
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        <div>
+            <AdminNavbar></AdminNavbar>
         </div>
-
-        <article class="content px-4">
+        <div>
+            <Navbar />
+        </div>
+        <article class="px-4">
             @Body
         </article>
+        <BlazoredToasts Position="ToastPosition.BottomRight" />
     </main>
 </div>

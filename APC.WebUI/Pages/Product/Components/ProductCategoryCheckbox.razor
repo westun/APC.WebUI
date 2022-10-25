@@ -1,0 +1,39 @@
+﻿<EditForm Model="CategoryCheckboxVM">
+    <div class="form-check">
+        <InputCheckbox @bind-Value="CategoryCheckboxVM.IsChecked"
+                        type="checkbox"
+                        class="form-check-input"
+                        id="@UniqueInputId"
+                        @onclick="() => OnClickHandler(CategoryCheckboxVM)">
+        </InputCheckbox>
+
+        <label class="form-check-label" for="@UniqueInputId">
+            @CategoryCheckboxVM.Category.Name
+        </label>
+        (@CategoryCheckboxVM.ProductCount)
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public ProductCategoryCheckboxVM CategoryCheckboxVM { get; set; }
+
+    [Parameter]
+    public EventCallback<ProductCategoryCheckboxVM> OnClickCallback { get; set; }
+
+    private string UniqueInputId { get; set; }
+
+    protected override void OnInitialized()
+    {
+        UniqueInputId = $"{this.CategoryCheckboxVM.Category.Name}_{this.CategoryCheckboxVM.Category.Id}";
+        UniqueInputId = UniqueInputId.Replace(" ", "_");
+    }
+
+    private async Task OnClickHandler(ProductCategoryCheckboxVM categoryVM)
+    {
+        //the model binding has not yet occurred, or something, so manually set here
+        categoryVM.IsChecked = !categoryVM.IsChecked;
+
+        await this.OnClickCallback.InvokeAsync(this.CategoryCheckboxVM);
+    }
+}
