@@ -20,7 +20,7 @@ namespace APC.DAL.Repositories
             return await dbContext.AreasOfApplication.OrderBy(a => a.Name).ToListAsync();
         }
 
-        public async Task Save(int productId, IEnumerable<AreasOfApplication> areasOfApplications)
+        public async Task SaveAsync(int productId, IEnumerable<AreasOfApplication> areasOfApplications)
         {
             if (areasOfApplications is null)
             {
@@ -58,7 +58,7 @@ namespace APC.DAL.Repositories
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<AreasOfApplication> Save(AreasOfApplication areasOfApplication)
+        public async Task<AreasOfApplication> SaveAsync(AreasOfApplication areasOfApplication)
         {
             if (areasOfApplication is null)
             {

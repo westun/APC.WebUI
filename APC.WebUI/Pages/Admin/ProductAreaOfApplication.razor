@@ -100,7 +100,7 @@ else
         try
         {
             await this.areasOfApplicationService
-                .SaveProductAreasOfApplication(this.ProductId, updatedAreasOfApplicationDTOs);
+                .SaveProductAreasOfApplicationAsync(this.ProductId, updatedAreasOfApplicationDTOs);
         }
         finally
         {

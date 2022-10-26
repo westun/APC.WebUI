@@ -37,7 +37,7 @@ namespace APC.DAL.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Product>> Search(string criteria)
+        public async Task<IEnumerable<Product>> SearchAsync(string criteria)
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
 
@@ -51,7 +51,7 @@ namespace APC.DAL.Repositories
             return allProducts.Where(p => p.Name.ToLower().Contains(criteria.ToLower()));
         }
 
-        public async Task<Product> Save(Product product)
+        public async Task<Product> SaveAsync(Product product)
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
             var addingNewProduct = product.Id <= 0;

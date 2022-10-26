@@ -4,6 +4,6 @@ namespace APC.DAL.Repositories
 {
     public interface IProductAttributeValueRepository
     {
-        Task Save(int productId, IEnumerable<ProductAttributeValue> productAttributeValues);
+        Task SaveAsync(int productId, IEnumerable<ProductAttributeValue> productAttributeValues);
     }
 }

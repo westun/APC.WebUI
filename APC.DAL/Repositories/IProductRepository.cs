@@ -6,7 +6,7 @@ namespace APC.DAL.Repositories
     {
         Task<Product> GetAsync(int id);
         Task<IEnumerable<Product>> GetAsync();
-        Task<IEnumerable<Product>> Search(string criteria);
-        Task<Product> Save(Product product);
+        Task<IEnumerable<Product>> SearchAsync(string criteria);
+        Task<Product> SaveAsync(Product product);
     }
 }

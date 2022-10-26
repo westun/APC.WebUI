@@ -5,8 +5,8 @@ namespace APC.WebUI.Services
     public interface IAreasOfApplicationService
     {
         Task<IEnumerable<AreasOfApplicationDTO>> GetAreasOfApplicationAsync();
-        Task SaveProductAreasOfApplication(int productId, IEnumerable<AreasOfApplicationDTO> areasOfApplicationDTOs);
-        Task<AreasOfApplicationDTO> SaveAreasOfApplication(AreasOfApplicationDTO areasOfApplicationDTO);
+        Task SaveProductAreasOfApplicationAsync(int productId, IEnumerable<AreasOfApplicationDTO> areasOfApplicationDTOs);
+        Task<AreasOfApplicationDTO> SaveAreasOfApplicationAsync(AreasOfApplicationDTO areasOfApplicationDTO);
 
     }
 }

@@ -13,7 +13,7 @@ namespace APC.DAL.Repositories
             this.dbContextFactory = dbContextFactory;
         }
 
-        public async Task Save(int productId, IEnumerable<ProductAttributeValue> productAttributeValues)
+        public async Task SaveAsync(int productId, IEnumerable<ProductAttributeValue> productAttributeValues)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
 

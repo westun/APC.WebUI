@@ -21,7 +21,7 @@ namespace APC.DAL.Repositories
                 .ToListAsync();
         }
 
-        public async Task<ProductType> Save(ProductType productType)
+        public async Task<ProductType> SaveAsync(ProductType productType)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
 

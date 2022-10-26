@@ -4,6 +4,6 @@ namespace APC.WebUI.Services
 {
     public interface IProductAttributeValueService
     {
-        Task SaveProductAttributeValues(int productId, IEnumerable<ProductAttributeValueDTO> productAttributeValueDTOs);
+        Task SaveProductAttributeValuesAsync(int productId, IEnumerable<ProductAttributeValueDTO> productAttributeValueDTOs);
     }
 }

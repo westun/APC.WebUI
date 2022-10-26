@@ -5,7 +5,7 @@ namespace APC.DAL.Repositories
     public interface IAreasOfApplicationRepository
     {
         Task<IEnumerable<AreasOfApplication>> GetAsync();
-        Task Save(int productId, IEnumerable<AreasOfApplication> areasOfApplications);
-        Task<AreasOfApplication> Save(AreasOfApplication areasOfApplication);
+        Task SaveAsync(int productId, IEnumerable<AreasOfApplication> areasOfApplications);
+        Task<AreasOfApplication> SaveAsync(AreasOfApplication areasOfApplication);
     }
 }

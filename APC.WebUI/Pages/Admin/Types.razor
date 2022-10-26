@@ -85,7 +85,7 @@ else
 
         this.SaveInProgress = true;
 
-        await this.productTypeService.SaveProductType(this.productTypeDTO);
+        await this.productTypeService.SaveProductTypeAsync(this.productTypeDTO);
 
         this.productTypeDTOs = await this.productTypeService.GetProductTypesAsync();
 

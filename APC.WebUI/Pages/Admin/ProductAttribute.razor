@@ -98,7 +98,7 @@ else
         this.SaveInProgress = true;
 
         await this.productAttributeValueService
-            .SaveProductAttributeValues(this.ProductId, this.productAttributeValueDTOs);
+            .SaveProductAttributeValuesAsync(this.ProductId, this.productAttributeValueDTOs);
 
         this.toastService.ShowSuccess(
             message: $"The Product Attributes have been Saved Successfully.",

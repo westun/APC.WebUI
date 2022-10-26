@@ -63,7 +63,7 @@ else
         this.SaveInProgress = true;
 
         var areasOfApplication = 
-            await this.areasOfApplicationService.SaveAreasOfApplication(this.areasOfApplicationDTO);
+            await this.areasOfApplicationService.SaveAreasOfApplicationAsync(this.areasOfApplicationDTO);
 
         this.areasOfApplicationDTOs =
                 await areasOfApplicationService.GetAreasOfApplicationAsync();

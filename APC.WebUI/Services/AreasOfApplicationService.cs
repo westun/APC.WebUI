@@ -29,7 +29,7 @@ namespace APC.WebUI.Services
             });
         }
 
-        public async Task SaveProductAreasOfApplication(
+        public async Task SaveProductAreasOfApplicationAsync(
             int productId,
             IEnumerable<AreasOfApplicationDTO> areasOfApplicationDTOs)
         {
@@ -41,16 +41,16 @@ namespace APC.WebUI.Services
             var areasOfApplication =
                 this.mapper.Map<IEnumerable<AreasOfApplication>>(areasOfApplicationDTOs);
 
-            await this.areasOfApplicationRepository.Save(productId, areasOfApplication);
+            await this.areasOfApplicationRepository.SaveAsync(productId, areasOfApplication);
         }
 
-        public async Task<AreasOfApplicationDTO> SaveAreasOfApplication(AreasOfApplicationDTO areasOfApplicationDTO)
+        public async Task<AreasOfApplicationDTO> SaveAreasOfApplicationAsync(AreasOfApplicationDTO areasOfApplicationDTO)
         {
             var areasOfApplication =
                 this.mapper.Map<AreasOfApplication>(areasOfApplicationDTO);
 
             var areasOfApplicationFromDB = 
-                await this.areasOfApplicationRepository.Save(areasOfApplication);
+                await this.areasOfApplicationRepository.SaveAsync(areasOfApplication);
 
             return this.mapper.Map<AreasOfApplicationDTO>(areasOfApplicationFromDB);
         }
