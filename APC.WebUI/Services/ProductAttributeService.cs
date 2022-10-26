@@ -29,11 +29,11 @@ namespace APC.WebUI.Services
             });
         }
 
-        public async Task<ProductAttributeDTO> SaveProductAttribute(ProductAttributeDTO productAttributeDTO)
+        public async Task<ProductAttributeDTO> SaveProductAttributeAsync(ProductAttributeDTO productAttributeDTO)
         {
             var attribute = this.mapper.Map<ProductAttribute>(productAttributeDTO);
 
-            var attributeFromDB = await this.productAttributeRepository.Save(attribute);
+            var attributeFromDB = await this.productAttributeRepository.SaveAsync(attribute);
 
             return this.mapper.Map<ProductAttributeDTO>(attributeFromDB);
         }

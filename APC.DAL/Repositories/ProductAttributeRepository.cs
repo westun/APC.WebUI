@@ -21,7 +21,7 @@ namespace APC.DAL.Repositories
                 .ToListAsync();
         }
 
-        public async Task<ProductAttribute> Save(ProductAttribute productAttribute)
+        public async Task<ProductAttribute> SaveAsync(ProductAttribute productAttribute)
         {
             if (productAttribute is null)
             {

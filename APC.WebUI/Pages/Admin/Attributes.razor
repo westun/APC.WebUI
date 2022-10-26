@@ -59,7 +59,7 @@ else
     {
         this.SaveInProgress = true;
 
-        await this.productAttributeService.SaveProductAttribute(this.productAttributeDTO);
+        await this.productAttributeService.SaveProductAttributeAsync(this.productAttributeDTO);
 
         this.productAttributeDTOs =
             (await this.productAttributeService.GetProductAttributesAsync()).ToArray();
