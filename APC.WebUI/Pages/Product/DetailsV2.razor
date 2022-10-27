@@ -1,6 +1,7 @@
 ﻿@page "/products/detail/{productId:int}"
 @inject IProductService productService
 @inject ISimilarProductsService similarProductsService
+@inject ICompatibleProductsService compatibleProductsService
 
 @if (this.product is null)
 {
@@ -97,6 +98,10 @@ else
         </div>
     </div>
     
+    <div class="mb-5 mt-3">
+        <CompatibleProductDetail CompatibleProductsDTO="this.compatibleProductsDTO" />
+    </div>
+
     <SimilarProductDetail SimilarProductsDTO="this.similarProductsDTOs"/>
 
     <div class="mb-5"></div>
@@ -108,11 +113,16 @@ else
 
     private ProductDTO product { get; set; }
     private IEnumerable<SimilarProductsDTO> similarProductsDTOs { get; set; }
+    private IEnumerable<CompatibleProductsDTO> compatibleProductsDTO { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
         this.product = await this.productService.GetProductByIdAsync(this.ProductId);
+
         this.similarProductsDTOs =
             await this.similarProductsService.GetSimilarProductsByProductIdAsync(this.ProductId);
+
+        this.compatibleProductsDTO =
+            await this.compatibleProductsService.GetCompatibleProductsByProductIdAsync(this.ProductId);
     }
 }
