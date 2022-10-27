@@ -28,6 +28,9 @@ namespace APC.WebUI.Configuration.AutoMapperProfiles
 
             this.CreateMap<SimilarProducts, SimilarProductsDTO>()
                 .ReverseMap();
+
+            this.CreateMap<CompatibleProducts, CompatibleProductsDTO>()
+                .ReverseMap();
         }
     }
 }

@@ -1,0 +1,139 @@
+﻿@page "/admin/product/{productid:int}/compatible"
+@inject ICompatibleProductsService compatibleProductsService
+@inject IProductService productService
+@inject IToastService toastService
+@using APC.WebUI.Pages.Admin.Components
+
+@if (this.CompatibleProductsDTO is null || this.ProductDTOs is null || this.Product is null)
+{
+    <Spinner/>
+}
+else
+{
+    <h3 class="mb-3">Compatible Products</h3>
+    <p class="mb-3">
+        Making changes for: <strong><span class="text-success">@Product.Name</span></strong>
+    </p>
+    <div class="row mb-5">
+        <div class="col-sm-6">
+            <EditForm Model="this" on OnValidSubmit="AddCompatibleProduct">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+                @*Custom error message for select controls that don't validate properly*@
+                <ul class="validation-message">@((MarkupString)CustomErrorMessage)</ul>
+                <label class="form-label">Select Compatible Products</label>
+                <InputSelect @bind-Value="NewCompatibleProductId" class="form-select">
+                    <option></option>
+                    @foreach (var product in ProductDTOs)
+                    {
+                        <option value="@product.Id">@product.Name</option>
+                    }
+                </InputSelect>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                    @if (this.SaveInProgress)
+                    {
+                        <span class="spinner-border text-success align-middle"></span>
+                    }
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+    <CompatibleProductList 
+        CompatibleProductsDTO="this.CompatibleProductsDTO"
+        RemoveProductCallback="RemoveCompatibleProduct"/>
+
+    <div class="mb-5"></div>
+}
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private ProductDTO Product { get; set; }
+
+    private List<CompatibleProductsDTO> CompatibleProductsDTO { get; set; }
+
+    private List<ProductDTO> ProductDTOs { get; set; }
+
+    private int NewCompatibleProductId { get; set; }
+
+    private bool SaveInProgress { get; set; }
+    private string CustomErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.CompatibleProductsDTO =
+            (await this.compatibleProductsService.GetCompatibleProductsByProductIdAsync(this.ProductId)).ToList();
+
+        var compatibleProductIds = this.CompatibleProductsDTO.Select(sp => sp.CompatibleProductId);
+
+        this.ProductDTOs = (await this.productService.GetAllProductsAsync())
+            .Where(p => !compatibleProductIds.Contains(p.Id) && p.Id != this.ProductId)
+            .ToList();
+
+        this.Product = await this.productService.GetProductByIdAsync(this.ProductId);
+    }
+
+    private async Task AddCompatibleProduct(EditContext editContext)
+    {
+        if (!FormIsValid())
+        {
+            return;
+        }
+
+        this.SaveInProgress = true;
+
+        await this.compatibleProductsService.SaveAsync(new CompatibleProductsDTO
+        {
+            TheProductid = this.ProductId,
+            CompatibleProductId = this.NewCompatibleProductId,
+        });
+
+        this.CompatibleProductsDTO =
+            (await this.compatibleProductsService.GetCompatibleProductsByProductIdAsync(this.ProductId)).ToList();
+
+        var productAdded = this.ProductDTOs.FirstOrDefault(p => p.Id == this.NewCompatibleProductId);
+
+        this.toastService.ShowSuccess(
+            message: $"The Compatible Product ({productAdded.Name}) has been Added Successfully.",
+            heading: "Success");
+
+        this.NewCompatibleProductId = 0;
+
+        this.ProductDTOs.Remove(productAdded);
+
+        this.SaveInProgress = false;
+    }
+
+    private bool FormIsValid()
+    {
+        this.CustomErrorMessage = null;
+
+        @if (this.NewCompatibleProductId <= 0)
+        {
+            this.CustomErrorMessage += "<li>You must Select a compatible Product.</li>";
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task RemoveCompatibleProduct(CompatibleProductsDTO compatibleProductsDTO)
+    {
+        await this.compatibleProductsService.DeleteAsync(compatibleProductsDTO);
+
+        this.toastService.ShowSuccess(
+            message: $"The Compatible Product ({compatibleProductsDTO.CompatibleProduct.Name}) has been Removed Successfully.",
+            heading: "Success");
+
+        this.CompatibleProductsDTO =
+            (await this.compatibleProductsService.GetCompatibleProductsByProductIdAsync(this.ProductId)).ToList();
+
+        var compatibleProductIds = this.CompatibleProductsDTO.Select(sp => sp.CompatibleProductId);
+        this.ProductDTOs = (await this.productService.GetAllProductsAsync())
+            .Where(p => !compatibleProductIds.Contains(p.Id) && p.Id != this.ProductId)
+            .ToList();
+    }
+}

@@ -13,6 +13,7 @@ namespace APC.WebUI.Configuration
             services.AddTransient<IAreasOfApplicationRepository, AreasOfApplicationRepository>();
             services.AddTransient<IProductAttributeValueRepository, ProductAttributeValueRepository>();
             services.AddTransient<IProductAttributeRepository, ProductAttributeRepository>();
+            services.AddTransient<ICompatibleProductsRepository, CompatibleProductsRepository>();
 
             return services;
         }
