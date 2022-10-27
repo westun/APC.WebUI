@@ -1,0 +1,40 @@
+﻿<div class="row">
+    <div class="col-sm-12">
+        @if (this.SimilarProductsDTO.Any())
+        {
+            <h3>Products that are similar</h3>
+        }
+    </div>
+</div>
+<div class="row g-4 row-cols-lg-5 row-cols-2 row-cols-md-3 mt-2">
+    @foreach (var sp in this.SimilarProductsDTO)
+    {
+        <div class="col">
+            <div class="card card-product">
+                <div class="card-body text-center py-8">
+                    <img src="@sp.SimiliarProduct.ImageUrl" class="w-75 h-75 mb-3" />
+                    <div class="text-truncate">@sp.SimiliarProduct.Name</div>
+                    <div class="mt-2">
+                        <button @onclick="() => RemoveProduct(sp)"
+                            class="btn btn-danger btn-sm">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<SimilarProductsDTO> SimilarProductsDTO { get; set; }
+
+    [Parameter]
+    public EventCallback<SimilarProductsDTO> RemoveProductCallback { get; set; }
+
+    private void RemoveProduct(SimilarProductsDTO similarProductsDTO)
+    {
+        this.RemoveProductCallback.InvokeAsync(similarProductsDTO);
+    }
+}

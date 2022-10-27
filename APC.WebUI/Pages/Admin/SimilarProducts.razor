@@ -1,0 +1,139 @@
+﻿@page "/admin/product/{productid:int}/similar"
+@inject ISimilarProductsService similarProductsService
+@inject IProductService productService
+@inject IToastService toastService
+@using APC.WebUI.Pages.Admin.Components
+
+@if (this.SimilarProductsDTO is null || this.ProductDTOs is null || this.Product is null)
+{
+    <Spinner/>
+}
+else
+{
+    <h3 class="mb-3">Similar Products</h3>
+    <p class="mb-3">
+        Making changes for: <strong><span class="text-success">@Product.Name</span></strong>
+    </p>
+    <div class="row mb-5">
+        <div class="col-sm-6">
+            <EditForm Model="this" on OnValidSubmit="AddSimilarProduct">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+                @*Custom error message for select controls that don't validate properly*@
+                <ul class="validation-message">@((MarkupString)CustomErrorMessage)</ul>
+                <label class="form-label">Select Similar Products</label>
+                <InputSelect @bind-Value="NewSimilarProductId" class="form-select">
+                    <option></option>
+                    @foreach (var product in ProductDTOs)
+                    {
+                        <option value="@product.Id">@product.Name</option>
+                    }
+                </InputSelect>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                    @if (this.SaveInProgress)
+                    {
+                        <span class="spinner-border text-success align-middle"></span>
+                    }
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+    <SimilarProductList 
+        SimilarProductsDTO="this.SimilarProductsDTO"
+        RemoveProductCallback="RemoveSimilarProduct"/>
+
+    <div class="mb-5"></div>
+}
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private ProductDTO Product { get; set; }
+
+    private List<SimilarProductsDTO> SimilarProductsDTO { get; set; }
+
+    private List<ProductDTO> ProductDTOs { get; set; }
+
+    private int NewSimilarProductId { get; set; }
+
+    private bool SaveInProgress { get; set; }
+    private string CustomErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.SimilarProductsDTO = 
+            (await this.similarProductsService.GetSimilarProductsByProductIdAsync(this.ProductId)).ToList();
+
+        var similarProductIds = this.SimilarProductsDTO.Select(sp => sp.SimilarProductId);
+
+        this.ProductDTOs = (await this.productService.GetAllProductsAsync())
+            .Where(p => !similarProductIds.Contains(p.Id) && p.Id != this.ProductId)
+            .ToList();
+
+        this.Product = await this.productService.GetProductByIdAsync(this.ProductId);
+    }
+
+    private async Task AddSimilarProduct(EditContext editContext)
+    {
+        if (!FormIsValid())
+        {
+            return;
+        }
+
+        this.SaveInProgress = true;
+
+        await this.similarProductsService.SaveAsync(new SimilarProductsDTO
+        {
+            TheProductid = this.ProductId,
+            SimilarProductId = this.NewSimilarProductId,
+        });
+
+        this.SimilarProductsDTO =
+            (await this.similarProductsService.GetSimilarProductsByProductIdAsync(this.ProductId)).ToList();
+
+        var productAdded = this.ProductDTOs.FirstOrDefault(p => p.Id == this.NewSimilarProductId);
+
+        this.toastService.ShowSuccess(
+            message: $"The Similar Product ({productAdded.Name}) has been Added Successfully.",
+            heading: "Success");
+
+        this.NewSimilarProductId = 0;
+
+        this.ProductDTOs.Remove(productAdded);
+
+        this.SaveInProgress = false;
+    }
+
+    private bool FormIsValid()
+    {
+        this.CustomErrorMessage = null;
+
+        @if (this.NewSimilarProductId <= 0)
+        {
+            this.CustomErrorMessage += "<li>You must Select a similar Product.</li>";
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task RemoveSimilarProduct(SimilarProductsDTO similarProductsDTO)
+    {
+        await this.similarProductsService.DeleteAsync(similarProductsDTO);
+
+        this.toastService.ShowSuccess(
+            message: $"The Similar Product ({similarProductsDTO.SimiliarProduct.Name}) has been Removed Successfully.",
+            heading: "Success");
+
+        this.SimilarProductsDTO =
+            (await this.similarProductsService.GetSimilarProductsByProductIdAsync(this.ProductId)).ToList();
+
+        var similarProductIds = this.SimilarProductsDTO.Select(sp => sp.SimilarProductId);
+        this.ProductDTOs = (await this.productService.GetAllProductsAsync())
+            .Where(p => !similarProductIds.Contains(p.Id) && p.Id != this.ProductId)
+            .ToList();
+    }
+}

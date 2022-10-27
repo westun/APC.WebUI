@@ -25,6 +25,9 @@ namespace APC.WebUI.Configuration.AutoMapperProfiles
 
             this.CreateMap<ProductAttribute, ProductAttributeDTO>()
                 .ReverseMap();
+
+            this.CreateMap<SimilarProducts, SimilarProductsDTO>()
+                .ReverseMap();
         }
     }
 }

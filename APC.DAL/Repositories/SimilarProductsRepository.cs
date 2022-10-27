@@ -24,5 +24,35 @@ namespace APC.DAL.Repositories
                 .Include(sp => sp.TheProduct)
                 .ToListAsync();
         }
+
+        public async Task SaveAsync(SimilarProducts similarProduct)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            var similiarProductFromDB = dbContext.SimilarProducts
+                .FirstOrDefault(sp =>
+                    sp.SimilarProductId == similarProduct.SimilarProductId
+                    && sp.TheProductid == similarProduct.TheProductid);
+            if (similiarProductFromDB is null)
+            {
+                dbContext.SimilarProducts.Add(similarProduct);
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteAsync(SimilarProducts similarProduct)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            var similiarProductFromDB = dbContext.SimilarProducts
+                .FirstOrDefault(sp => 
+                    sp.SimilarProductId == similarProduct.SimilarProductId
+                    && sp.TheProductid == similarProduct.TheProductid);
+            if (similiarProductFromDB is not null)
+            {
+                dbContext.SimilarProducts.Remove(similiarProductFromDB);
+                await dbContext.SaveChangesAsync();
+            }
+        }
     }
 }
