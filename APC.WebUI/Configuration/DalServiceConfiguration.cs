@@ -14,6 +14,7 @@ namespace APC.WebUI.Configuration
             services.AddTransient<IAreasOfApplicationService, AreasOfApplicationService>();
             services.AddTransient<IProductAttributeValueService, ProductAttributeValueService>();
             services.AddTransient<IProductAttributeService, ProductAttributeService>();
+            services.AddTransient<IBrochureUploadService, BrochureUploadService>();
 
             return services;
         }

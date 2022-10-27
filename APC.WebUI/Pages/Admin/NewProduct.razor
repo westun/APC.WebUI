@@ -6,11 +6,12 @@
 @inject IProductCategoryService productCategoryService
 @inject IProductTypeService productTypeService
 @inject IFileUploadService fileUploadService
+@inject IBrochureUploadService brochureUploadService
 
 <div class="container">
     <div class="row">
         <div class="col-6">
-            @if (Product.Id > 0)
+            @if (IsEditing)
             {
                 <h1>Modify Product</h1>
             }
@@ -32,12 +33,13 @@
 <div class="container">
     <div class="row mb-5">
         <div class="col-sm-6">
-        <EditForm Model="@Product" OnValidSubmit="@SaveProduct">
+            <EditForm Model="@Product" OnValidSubmit="@SaveProduct">
             <DataAnnotationsValidator />
             <ValidationSummary />
             @*Custom error message for select controls that don't validate properly*@
             <ul class="validation-message">@((MarkupString)CustomErrorMessage)</ul>
-
+            <ul class="validation-message">@((MarkupString)BrochureErrorMessage)</ul>
+                
             <div class="mb-3">
                 <label for="name" class="form-label">Product Name</label>
                 <InputText @bind-Value="Product.Name" id="name" class="form-control" />
@@ -81,7 +83,6 @@
                     @onclick="OnReycledCheckboxClick" />
                 <label class="form-check-label" for="recycled">@RecycledLabelText</label>
             </div>
-
             @if (this.AllowPhotoUpload)
             {
                 <div class="mb-4">
@@ -89,6 +90,23 @@
                     <InputFile OnChange="OnPhotoUploadChange" class="form-control"></InputFile>
                 </div>
             }
+            <div class="mb-4">
+                <label for="brochureUpload" class="form-label">Product Brochure</label>
+                <InputFile 
+                    id="brochureUpload" 
+                    class="form-control"
+                    OnChange="OnBrochureUploadChange"/>
+                <div class="form-text">
+                    @if (!string.IsNullOrEmpty(this.Product.BrochureUrl))
+                    {
+                        @:(Current brochure file name: @Path.GetFileName(this.Product.BrochureUrl))
+                    }
+                    else if (IsEditing && this.Product.BrochureUrl is null)
+                    {
+                        @:(There is currently no brochure file uploaded.)
+                    }
+                </div>
+            </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-primary me-2">Save</button>
                 @if (this.SaveInProgress)
@@ -100,15 +118,20 @@
         </EditForm>
     </div>
 
-    @if (Product.Id > 0)
+    @if (IsEditing)
     {
         <div class="col-sm-6">
             <h2>Product Photo</h2>
-            <img src="@Product.ImageUrl" />
+            <img src="@Product.ImageUrl" style="border:gray 1px solid;" />
             @if (!AllowPhotoUpload)
             {
                 <p>
-                    <button type="button" class="btn btn-primary" @onclick="OnChangePhotoClick">Change Photo</button>
+                    <button 
+                        type="button" 
+                        class="btn btn-primary mt-3" 
+                        @onclick="OnChangePhotoClick">
+                        Change Photo
+                    </button>
                 </p>
             }
         </div>
@@ -127,21 +150,24 @@
     private IEnumerable<ProductTypeDTO> ProductTypes { get; set; } = new List<ProductTypeDTO>();
 
     private string CustomErrorMessage { get; set; }
+    private string BrochureErrorMessage { get; set; }
+
     private bool ShowSuccessAlert { get; set; }
     private bool SaveInProgress { get; set; }
     private bool AllowPhotoUpload { get; set; } = true;
+    
+    private bool IsEditing => this.ProductId > 0;
 
     private string RecycledLabelText { get; set; }
     private string RecycledLabelIsChecked = "This Product is Recycled";
     private string RecycledLabelIsNotChecked = "This Product is NOT Recycled";
 
-
     private IBrowserFile SelectedFile { get; set; }
+    private IBrowserFile SelectedBrochureFile { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        var isEditing = this.ProductId > 0;
-        if (isEditing)
+        if (IsEditing)
         {
             this.Product = await this.productService.GetProductByIdAsync(this.ProductId);
             await this.OnProductCategoryChange(this.Product.Category.Id);
@@ -158,6 +184,7 @@
     private async Task SaveProduct(EditContext editContext)
     {
         this.CustomErrorMessage = null;
+        this.BrochureErrorMessage = null;
 
         if (!IsFormValid())
         {
@@ -177,6 +204,17 @@
                 };
                 var fileUploadResult = await this.fileUploadService.UploadFile(fileUploadData);
                 this.Product.ImageUrl = fileUploadResult.FileUrl.ToString();
+            }
+
+            @if (this.SelectedBrochureFile is not null)
+            {
+                var brochureUploadData = new FileUploadDataDTO
+                {
+                    FileName = this.GetUniqueFileName(this.SelectedBrochureFile.Name),
+                    BrowserFile = this.SelectedBrochureFile,
+                };
+                var brochureUploadResult = await this.brochureUploadService.UploadFile(brochureUploadData);
+                this.Product.BrochureUrl = brochureUploadResult.FileUrl.ToString();
             }
 
             var product = await this.productService.Save(this.Product);
@@ -228,10 +266,21 @@
             isValid = true;
         }
 
-        @if (this.SelectedFile is null && this.AllowPhotoUpload)
+    @if (this.SelectedFile is null && this.AllowPhotoUpload)
         {
             isValid = false;
             this.CustomErrorMessage += "<li>Photo Upload is required. </li>";
+        }
+        else
+        {
+            isValid = true;
+        }
+
+        @if (this.SelectedBrochureFile is not null 
+            && this.SelectedBrochureFile.ContentType != "application/pdf")
+        {
+            isValid = false;
+            this.BrochureErrorMessage += "<li>The Brochure must be in PDF format.</li>";
         }
         else
         {
@@ -245,6 +294,7 @@
     {
         this.Product = new ProductDTO();
         this.SelectedFile = null;
+        this.SelectedBrochureFile = null;
         this.AllowPhotoUpload = true;
     }
 
@@ -256,6 +306,19 @@
     private void OnPhotoUploadChange(InputFileChangeEventArgs e)
     {
         this.SelectedFile = e.File;
+        this.StateHasChanged();
+    }
+
+    private void OnBrochureUploadChange(InputFileChangeEventArgs e)
+    {
+        this.BrochureErrorMessage = null;
+
+        if (e.File.ContentType != "application/pdf")
+        {
+            this.BrochureErrorMessage = "The Brochure must be in PDF format.";
+        }
+
+        this.SelectedBrochureFile = e.File;
         this.StateHasChanged();
     }
 

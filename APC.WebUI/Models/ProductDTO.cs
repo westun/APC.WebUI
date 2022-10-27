@@ -16,6 +16,7 @@ namespace APC.WebUI.Models
 
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
+        public string? BrochureUrl { get; set; }
         public bool Recycled { get; set; }
 
         public ProductCategoryDTO Category { get; set; }
