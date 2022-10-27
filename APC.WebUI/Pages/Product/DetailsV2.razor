@@ -62,15 +62,7 @@ else
                 
                 <hr class="my-6">
                 <h3>Product Info</h3>
-                @if (this.product.BrochureUrl is not null)
-                {
-                    <div class="mt-3 mb-2">
-                        <a href="@this.product.BrochureUrl" target="_blank">
-                            <span class="bi bi-download"></span>
-                            Download Our Brochure
-                        </a>
-                    </div>
-                }
+                
                 <div>
                     <table class="table table-borderless">
                         <tbody>
@@ -84,6 +76,15 @@ else
                         </tbody>
                     </table>
                 </div>
+                @if (this.product.BrochureUrl is not null)
+                {
+                    <div class="mt-3 mb-2">
+                        <a href="@this.product.BrochureUrl" target="_blank">
+                            <span class="bi bi-download"></span>
+                            Download Our Brochure
+                        </a>
+                    </div>
+                }
                 <hr class="my-6"/>
                 <div>
                     <h3>Areas of Application</h3>
