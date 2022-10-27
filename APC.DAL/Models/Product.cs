@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-
-namespace APC.DAL.Models
+﻿namespace APC.DAL.Models
 {
     public class Product
     {

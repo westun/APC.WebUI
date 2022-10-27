@@ -34,6 +34,7 @@ namespace APC.DAL.DataAccess
         public DbSet<ProductAttributeValue> ProductAttributeValue { get; set; }
         public DbSet<SimilarProducts> SimilarProducts { get; set; }
         public DbSet<Account> Account { get; set; }
+        public DbSet<CompatibleProducts> CompatibleProducts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
