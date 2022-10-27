@@ -20,6 +20,19 @@ else
         <div class="float-sm-start mb-3">
             <div class="card">
                 <div class="card-body p-6">
+                    <h4>Display</h4>
+                    <div class="mt-3">
+                        <button @onclick="DisplayInGridClicked" class="me-3 btn btn-primary">
+                            Grid <i class="bi bi-grid-3x3-gap"></i>
+                        </button>
+                        <button @onclick="DisplayInRowsClicked" class="me-3 btn btn-primary">
+                            Rows <i class="bi bi-list-ul"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body p-6">
                     <h4>Categories</h4>
                     @for (int i = 0; i < this.CategoryCheckboxVMs.Count(); i++)
                     {
@@ -39,14 +52,26 @@ else
                 </div>
             </div>
         </div>
-        <div class="d-flex row">
-            @foreach (var product in this.Products)
-            {
-                <div class="col-md-4 col-sm-6 mb-3">
-                    <ProductItemDisplay Product="product" />
-                </div>
-            }
-        </div>
+        @if (DisplayInRows)
+        {
+            <div class="d-flex row">
+                @foreach (var product in this.Products)
+                {
+                    <ProductItemRowDisplay Product="product" />
+                }
+            </div>
+        }
+        else
+        {
+            <div class="d-flex row">
+                @foreach (var product in this.Products)
+                {
+                    <div class="col-md-4 col-sm-6 mb-3">
+                        <ProductItemDisplay Product="product" />
+                    </div>
+                }
+            </div>
+        }
     </div>
 }
 
@@ -55,12 +80,12 @@ else
 
     private IEnumerable<ProductCategoryDTO> Categories = new List<ProductCategoryDTO>();
 
-    //array allows mutability, it seems.
     private ProductCategoryCheckboxVM[] CategoryCheckboxVMs = new ProductCategoryCheckboxVM[0];
 
     private bool RecycledFilter { get; set; } = true;
     private bool VirginFilter { get; set; } = true;
     private bool? HasSelectedRecycled { get; set; } //button Show me recycled products}
+    private bool DisplayInRows { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -96,5 +121,15 @@ else
         this.Products = productsFromDB
             .Where(p => selectedIds.Contains(p.CategoryId))
             .ToList();
+    }
+
+    private void DisplayInGridClicked()
+    {
+        DisplayInRows = false;
+    }
+
+    private void DisplayInRowsClicked()
+    {
+        DisplayInRows = true;
     }
 }
