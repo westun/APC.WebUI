@@ -1,8 +1,7 @@
 using APC.DAL.DataAccess;
-using APC.DAL.Repositories;
+using APC.DAL.Models;
 using APC.WebUI.Configuration;
 using APC.WebUI.Models;
-using APC.WebUI.Services;
 using Blazored.Toast;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -136,6 +135,9 @@ namespace APC.WebUI
                 dbContext.SaveChanges();
             }
 
+            //create shopping cart for account if one doesn't exist that is not completed
+            CreateShoppingCart(dbContext, account.Id);
+
             await Task.Yield();
         }
 
@@ -179,6 +181,18 @@ namespace APC.WebUI
                 c => c.Type == "idp_access_token")?.Value;
 
             return authClaims;
+        }
+        
+        private static void CreateShoppingCart(APCContext dbContext, int accountId)
+        {
+            var cart = dbContext.Cart
+                .FirstOrDefault(c => c.AccountId == accountId && !c.Completed);
+            if (cart is null)
+            {
+                var newCart = new Cart { AccountId = accountId };
+                dbContext.Cart.Add(newCart);
+                dbContext.SaveChanges();
+            }
         }
     }
 }
