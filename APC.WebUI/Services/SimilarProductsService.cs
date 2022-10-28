@@ -1,6 +1,6 @@
-﻿using APC.DAL.Repositories;
+﻿using APC.DAL.Models;
+using APC.DAL.Repositories;
 using APC.WebUI.Models;
-using APC.WebUI.Pages.Admin;
 using AutoMapper;
 
 namespace APC.WebUI.Services
@@ -33,14 +33,14 @@ namespace APC.WebUI.Services
 
         public async Task SaveAsync(SimilarProductsDTO similarProductsDTO)
         {
-            var similarProduct = this.mapper.Map<APC.DAL.Models.SimilarProducts>(similarProductsDTO);
+            var similarProduct = this.mapper.Map<SimilarProducts>(similarProductsDTO);
 
             await this.similarProductsRepository.SaveAsync(similarProduct);
         }
 
         public async Task DeleteAsync(SimilarProductsDTO similarProductsDTO)
         {
-            var similarProduct = this.mapper.Map<APC.DAL.Models.SimilarProducts>(similarProductsDTO);
+            var similarProduct = this.mapper.Map<SimilarProducts>(similarProductsDTO);
 
             await this.similarProductsRepository.DeleteAsync(similarProduct);
         }
