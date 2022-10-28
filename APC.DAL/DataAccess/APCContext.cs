@@ -1,6 +1,5 @@
 ﻿using APC.DAL.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace APC.DAL.DataAccess
 {
@@ -35,11 +34,43 @@ namespace APC.DAL.DataAccess
         public DbSet<SimilarProducts> SimilarProducts { get; set; }
         public DbSet<Account> Account { get; set; }
         public DbSet<CompatibleProducts> CompatibleProducts { get; set; }
+        public DbSet<Cart> Cart { get; set; }
+        public DbSet<CartProduct> CartProducts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //this is old entity framework
-            //modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            modelBuilder.Entity<CartProduct>(eb =>
+            {
+                eb.HasKey(c => new { c.CartId, c.ProductId });
+                eb.ToTable("CartProduct");
+                eb.Property(p => p.ProductQuantity)
+                    .HasColumnName("ProductQuantity");
+
+                //EF automatically configured these relationships correctly, adding for example
+                eb.HasOne(cp => cp.Cart)
+                    .WithMany(cp => cp.CartProducts);
+
+                eb.HasOne(cp => cp.Product)
+                    .WithMany(cp => cp.CartProducts);
+            });
+
+            modelBuilder.Entity<Cart>(eb => 
+            {
+                eb.ToTable("Cart");
+
+                eb.HasOne(c => c.Account)
+                    .WithMany(a => a.Carts);
+
+                eb.HasMany(c => c.CartProducts)
+                    .WithOne(cp => cp.Cart);
+            });
+
+            modelBuilder.Entity<Product>(eb => 
+            {
+                eb.HasMany(p => p.CartProducts)
+                    .WithOne(cp => cp.Product);
+            });
+
         }
     }
 }
