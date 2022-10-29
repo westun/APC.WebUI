@@ -28,7 +28,8 @@ namespace APC.DAL.Repositories
             else
             {
                 //increase quantity
-                cartProductFromDB.ProductQuantity++; // or += cartProduct.quantity;
+                cartProductFromDB.ProductQuantity += cartProduct.ProductQuantity;
+                await dbContext.SaveChangesAsync();
             }
         }
 

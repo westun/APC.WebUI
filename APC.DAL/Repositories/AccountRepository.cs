@@ -4,23 +4,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APC.DAL.Repositories
 {
-    public class CartRepository : ICartRepository
+    public class AccountRepository : IAccountRepository
     {
         private readonly IDbContextFactory<APCContext> dbContextFactory;
 
-        public CartRepository(IDbContextFactory<APCContext> dbContextFactory)
+        public AccountRepository(IDbContextFactory<APCContext> dbContextFactory)
         {
             this.dbContextFactory = dbContextFactory;
         }
 
-        public async Task<Cart> GetAsync(int accountId)
+        public async Task<Account> GetAsync(string OID)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
-            return dbContext.Cart
-                .Include(c => c.Account)
-                .Include(c => c.CartProducts)
-                .FirstOrDefault(c => c.Id == accountId && !c.Completed);
+            return dbContext.Account
+                .FirstOrDefault(c => c.ObjectIdentifier == OID);
         }
     }
 }
