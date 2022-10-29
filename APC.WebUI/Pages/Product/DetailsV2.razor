@@ -50,12 +50,18 @@ else
                     </span>
                 </div>
                 <div>
-                    <div class="input-group input-spinner  ">
-                        <input type="button" value="-" class="button-minus  btn  btn-sm " data-field="quantity">
-                        <input type="number" step="1" max="10" value="1" name="quantity" class="quantity-field form-control-sm form-input   ">
-                        <input type="button" value="+" class="button-plus btn btn-sm " data-field="quantity">
+                    <div class="input-group input-spinner">
+                        <input @onclick="DecreaseQuantity" type="button" value="-" class="button-minus  btn  btn-sm " data-field="quantity">
+                        <input @bind-value="SelectedQuantity" type="number" step="1" min="1" max="20" name="quantity" class="quantity-field form-control-sm form-input">
+                        <input @onclick="IncreaseQuantity" type="button" value="+" class="button-plus btn btn-sm " data-field="quantity">
                     </div>
                 </div>
+                @if (this.cartProductDTO is not null)
+                {
+                    <div class="my-3">
+                        <span class="text-bg-light-warning text-muted p-2">You currently have <strong>@cartProductDTO.ProductQuantity</strong> of these items in your cart.</span>
+                    </div>
+                }
                 <div class="mt-3 row justify-content-start g-2 align-items-center">
                     <div class="col-xxl-4 col-lg-4 col-md-5 col-5 d-grid">
                         <button type="button" class="btn btn-primary" @onclick="AddToCart">
@@ -122,6 +128,11 @@ else
     private IEnumerable<SimilarProductsDTO> similarProductsDTOs { get; set; }
     private IEnumerable<CompatibleProductsDTO> compatibleProductsDTO { get; set; }
     private CartDTO cartDTO { get; set; }
+    private CartProductDTO cartProductDTO { get; set; }
+
+    private int accountId { get; set; }
+
+    private int SelectedQuantity { get; set; } = 1;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -136,20 +147,46 @@ else
         var userOID = await this.GetUserOID();
         var account = await this.accountService.GetAccountAsync(userOID);
         this.cartDTO = await this.cartService.GetCartAsync(account.Id);
+        this.accountId = account.Id;
+
+        this.cartProductDTO = this.cartDTO.CartProducts
+            .FirstOrDefault(cp => cp.ProductId == this.ProductId);
     }
 
     private async Task AddToCart()
     {
+        if (this.SelectedQuantity <= 0)
+        {
+            this.toastService.ShowError(
+                message: $"You must select a quantity more than 0.",
+                heading: "Error");
+
+            return;
+        }
+
         await this.cartProductService.AddAsync(new CartProductDTO
         {
             CartId = this.cartDTO.Id,
             ProductId = this.ProductId,
-            ProductQuantity = 1,
+            ProductQuantity = this.SelectedQuantity,
         });
 
         this.toastService.ShowSuccess(
             message: $"Item ({this.product.Name}) has been added to your shopping cart.",
             heading: "Success");
+
+        if (this.cartProductDTO is null)
+        {
+            this.cartDTO = await this.cartService.GetCartAsync(this.accountId);
+            this.cartProductDTO = this.cartDTO.CartProducts
+                .FirstOrDefault(cp => cp.ProductId == this.ProductId);
+        }
+        else
+        {
+            this.cartProductDTO.ProductQuantity += this.SelectedQuantity;
+        }
+
+        this.SelectedQuantity = 1;
     }
 
     private async Task<string> GetUserOID()
@@ -162,5 +199,18 @@ else
             .FirstOrDefault(c => c.Type == nameIdentifierClaimType)?.Value;
 
         return userOID;
+    }
+
+    public void IncreaseQuantity()
+    {
+        this.SelectedQuantity++;
+    }
+
+    public void DecreaseQuantity()
+    {
+        if (this.SelectedQuantity > 1)
+        {
+            this.SelectedQuantity--;
+        }
     }
 }
