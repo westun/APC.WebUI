@@ -15,6 +15,7 @@ namespace APC.WebUI.Configuration
             services.AddTransient<IProductAttributeRepository, ProductAttributeRepository>();
             services.AddTransient<ICompatibleProductsRepository, CompatibleProductsRepository>();
             services.AddTransient<ICartProductRepository, CartProductRepository>();
+            services.AddTransient<ICartRepository, CartRepository>();
 
             return services;
         }
