@@ -52,9 +52,9 @@ namespace APC.WebUI
 
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor()
-                .AddMicrosoftIdentityConsentHandler();
+                .AddMicrosoftIdentityConsentHandler()
             //to display errors in hosted site
-            //.AddCircuitOptions(options => { options.DetailedErrors = true; });
+            .AddCircuitOptions(options => { options.DetailedErrors = true; });
 
             builder.Services.AddDbContextFactory<APCContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
@@ -125,6 +125,8 @@ namespace APC.WebUI
                 //matching email can access the site.
                 //TODO: sign out user and display error message
                 return;
+
+                //or create a new account while testing?
             }
             
             var isMissingOID = account is not null 
