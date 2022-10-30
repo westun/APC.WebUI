@@ -1,0 +1,71 @@
+﻿@inject ICartService cartService
+@inject IAccountService accountService
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    private int cartItemCount;
+    public int CartItemCount
+    {
+        get
+        {
+            return this.cartItemCount;
+        }
+        set
+        {
+            this.cartItemCount = value;
+            this.StateHasChanged();
+        }
+    }
+
+    private int currentAccountId;
+    public int CurrentAccountId
+    {
+        get
+        {
+            return this.currentAccountId;
+        }
+        set
+        {
+            this.currentAccountId = value;
+            this.StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var OID = await this.GetUserOID();
+        this.currentAccountId = await this.GetAccountId(OID);
+
+        var cart = await this.cartService.GetCartAsync(this.currentAccountId);
+        var quantityArray = cart.CartProducts.Select(cp => cp.ProductQuantity).ToArray();
+        this.cartItemCount = quantityArray.Sum();
+    }
+
+    private async Task<int> GetAccountId(string userOID)
+    {
+        var account = await this.accountService.GetAccountAsync(userOID);
+
+        return account.Id;
+    }
+
+    private async Task<string> GetUserOID()
+    {
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+
+        var nameIdentifierClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+        var userOID = user.Claims
+            .FirstOrDefault(c => c.Type == nameIdentifierClaimType)?.Value;
+
+        return userOID;
+    }
+}

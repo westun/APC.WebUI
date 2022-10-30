@@ -49,6 +49,9 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+    [CascadingParameter]
+    private CascadingAppState AppState { get; set; }
+
     private CartDTO CartDTO { get; set; }
 
     private int AccountId { get; set; }
@@ -88,14 +91,33 @@ else
             heading: "Success");
 
         this.CartDTO.CartProducts.Remove(cartProductDTO);
+
+        this.AppState.CartItemCount -= cartProductDTO.ProductQuantity;
     }
 
     public async Task ChangeQuantity(CartProductDTO cartProductDTO)
     {
+        var cart = await this.cartService.GetCartAsync(this.AccountId);
+
+        int currentQuantity = cart.CartProducts
+            .FirstOrDefault(cp => cp.ProductId == cartProductDTO.ProductId
+                && cp.CartId == cartProductDTO.CartId).ProductQuantity;
+
         await this.cartProductService.UpdateAsync(cartProductDTO);
 
         this.toastService.ShowSuccess(
             message: $"Quantity for item '{cartProductDTO.Product.Name}' has be changed.",
             heading: "Success");
+
+        if (currentQuantity > cartProductDTO.ProductQuantity)
+        {
+            int quantityToRemove = currentQuantity - cartProductDTO.ProductQuantity;
+            this.AppState.CartItemCount -= quantityToRemove;
+        }
+        else
+        {
+            int quantityToAdd = cartProductDTO.ProductQuantity - currentQuantity;
+            this.AppState.CartItemCount += quantityToAdd;
+        }
     }
 }

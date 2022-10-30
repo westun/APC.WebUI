@@ -41,8 +41,13 @@
             <span class="text-light"> | </span>
             <a href="cart" class="text-light">
                 Cart
-                <span class="bi-cart3 text-light">&nbsp;5</span>
+                <span class="bi-cart3 text-light">&nbsp;@AppState.CartItemCount</span>
             </a>
         </div>
     </div>
 </nav>
+
+@code {
+    [CascadingParameter]
+    private CascadingAppState AppState { get; set; }
+}

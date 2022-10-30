@@ -124,6 +124,9 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+    [CascadingParameter]
+    private CascadingAppState AppState { get; set; }
+
     private ProductDTO product { get; set; }
     private IEnumerable<SimilarProductsDTO> similarProductsDTOs { get; set; }
     private IEnumerable<CompatibleProductsDTO> compatibleProductsDTO { get; set; }
@@ -186,6 +189,7 @@ else
             this.cartProductDTO.ProductQuantity += this.SelectedQuantity;
         }
 
+        this.AppState.CartItemCount += this.SelectedQuantity;
         this.SelectedQuantity = 1;
     }
 
