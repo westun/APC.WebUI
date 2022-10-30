@@ -24,5 +24,12 @@ namespace APC.WebUI.Services
 
             await this.cartProductRepository.AddAsync(cartProduct);
         }
+
+        public async Task DeleteAsync(CartProductDTO cartProductDTO)
+        {
+            var cartProduct = this.mapper.Map<CartProduct>(cartProductDTO);
+
+            await this.cartProductRepository.DeleteAsync(cartProduct);
+        }
     }
 }

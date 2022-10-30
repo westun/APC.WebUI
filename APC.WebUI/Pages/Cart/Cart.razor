@@ -1,124 +1,128 @@
 ﻿@page "/cart"
+@inject IAccountService accountService
+@inject ICartService cartService
+@inject ICartProductService cartProductService
+@inject IToastService toastService
 
-<h3>Your Shopping Cart</h3>
+@if (this.CartDTO is null)
+{
+    <Spinner/>
+}
+else
+{
+    <h3>Your Shopping Cart</h3>
 
-<div class="row">
-    <div class="col-lg-8 col-md-7">
-        <div class="py-3">
-            <!-- alert -->
-            <div class="alert alert-danger p-2" role="alert">
-                You’ve got FREE delivery. Start <a href="#!" class="alert-link">checkout now!</a>
-            </div>
-            <ul class="list-group list-group-flush">
-                <!-- list group -->
-                <li class="list-group-item py-3 py-lg-0 px-0 border-top">
-                    <!-- row -->
-                    <div class="row align-items-center">
-                        <div class="col-3 col-md-2">
-                            <!-- img --> <img src="../../assets/images/products/product-img-1.jpg" alt="Ecommerce"
-                                              class="img-fluid">
-                        </div>
-                        <div class="col-4 col-md-5">
-                            <!-- title -->
-                            <a href="shop-single.html" class="text-inherit">
-                                <h6 class="mb-0">Haldiram's Sev Bhujia</h6>
-                            </a>
-                            <span><small class="text-muted">.98 / lb</small></span>
-                            <!-- text -->
-                            <div class="mt-2 small lh-1">
-                                <a href="#!" class="text-decoration-none text-inherit">
-                                    <span class="me-1 align-text-bottom">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-trash-2 text-success">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                            </path>
-                                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                                        </svg>
-                                    </span>
-                                    <span class="text-muted">Remove</span>
-                                </a>
+    <div class="row">
+        <div class="col-lg-8 col-md-7">
+            <div class="py-3">
+                <div class="alert alert-success p-2" role="alert">
+                    Start your <a href="#!" class="alert-link">checkout now!</a>
+                </div>
+                <div class="mb-3">
+                    <h4>There are @this.CartDTO.CartProducts.Count() items in your cart</h4>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @{var cartProductsArray = this.CartDTO.CartProducts.ToArray();}
+                    @*@for (int i = 0; i < this.CartDTO.CartProducts.Count(); i++)*@
+                    @foreach (var cartProduct in this.CartDTO.CartProducts)
+                    {
+                        @*var lastProductIndex = cartProductsArray.Length - 1;;*@
+                        <li class="list-group-item py-3 py-lg-0 px-0 ">
+                            <div class="row align-items-center">
+                                <div class="col-3 col-md-2">
+                                    <img src="@cartProduct.Product.ImageUrl" alt="Ecommerce" class="img-fluid">
+                                </div>
+                                <div class="col-4 col-md-5">
+                                    <a href="/products/detail/@cartProduct.Product.Id" class="text-inherit">
+                                        <h6 class="mb-0">@cartProduct.Product.Name</h6>
+                                    </a>
+                                    <span><small class="text-muted">@cartProduct.Product.Type.Name</small></span>
+                                    <div class="mt-2 small lh-1" >
+                                        <span class="text-decoration-none text-inherit cursor-pointer" @onclick="() => RemoveProduct(cartProduct)">
+                                            <span class="me-1 align-text-bottom">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="feather feather-trash-2 text-success">
+                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                    </path>
+                                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                </svg>
+                                            </span>
+                                            <span class="text-muted">Remove</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-3 col-md-3 col-lg-2">
+                                    <div class="input-group input-spinner  ">
+                                        <input type="button" value="-" class="button-minus  btn  btn-sm " data-field="quantity">
+                                        <input type="number" step="1" max="10" value="1" name="quantity" class="quantity-field form-control-sm form-input   ">
+                                        <input type="button" value="+" class="button-plus btn btn-sm " data-field="quantity">
+                                    </div>
+                                </div>
+                                <div class="col-2 text-lg-end text-start text-md-end col-md-2">
+                                    <span class="fw-bold">$5.00</span>
+                                </div>
                             </div>
-                        </div>
-                        <!-- input group -->
-                        <div class="col-3 col-md-3 col-lg-2">
-                            <!-- input -->
-                            <div class="input-group input-spinner  ">
-                                <input type="button" value="-" class="button-minus  btn  btn-sm " data-field="quantity">
-                                <input type="number" step="1" max="10" value="1" name="quantity" class="quantity-field form-control-sm form-input   ">
-                                <input type="button" value="+" class="button-plus btn btn-sm " data-field="quantity">
-                            </div>
-                        </div>
-                        <!-- price -->
-                        <div class="col-2 text-lg-end text-start text-md-end col-md-2">
-                            <span class="fw-bold">$5.00</span>
-                        </div>
-                    </div>
-                </li>
-                <!-- list group -->
-                <li class="list-group-item py-3 py-lg-0 px-0 border-bottom">
-                    <!-- row -->
-                    <div class="row align-items-center">
-                        <div class="col-3 col-md-2">
-                            <!-- img --> <img src="../../assets/images/products/product-img-5.jpg" alt="Ecommerce"
-                                              class="img-fluid">
-                        </div>
-                        <div class="col-4 col-md-5">
-                            <!-- title -->
-                            <a href="shop-single.html" class="text-inherit">
-                                <h6 class="mb-0">Salted Instant Popcorn </h6>
-                            </a>
-                            <span><small class="text-muted">100g</small></span>
-                            <!-- text -->
-                            <div class="mt-2 small lh-1">
-                                <a href="#!" class="text-decoration-none text-inherit">
-                                    <span class="me-1 align-text-bottom">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-trash-2 text-success">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                            </path>
-                                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                                        </svg>
-                                    </span>
-                                    <span class="text-muted">Remove</span>
-                                </a>
-                            </div>
-                        </div>
-                        <!-- input group -->
-                        <div class="col-3 col-md-3 col-lg-2">
-                            <!-- input -->
-                            <div class="input-group input-spinner  ">
-                                <input type="button" value="-" class="button-minus  btn  btn-sm " data-field="quantity">
-                                <input type="number" step="1" max="10" value="1" name="quantity" class="quantity-field form-control-sm form-input   ">
-                                <input type="button" value="+" class="button-plus btn btn-sm " data-field="quantity">
-                            </div>
-                        </div>
-                        <!-- price -->
-                        <div class="col-2 text-lg-end text-start text-md-end col-md-2">
-                            <span class="fw-bold">$15.00</span>
-                            <div class="text-decoration-line-through text-muted small">$25.00</div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-            <!-- btn -->
-            <div class="d-flex justify-content-between mt-4">
-                <a href="#!" class="btn btn-primary">Continue Shopping</a>
-                <a href="#!" class="btn btn-dark">Update Cart</a>
+                        </li>
+                    }
+                </ul>
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="products/browse" class="btn btn-primary">Continue Shopping</a>
+                    <a href="#!" class="btn btn-dark">Update Cart</a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-12 col-lg-4 col-md-5">
-        <SummarySidebar/>    
+        <div class="col-12 col-lg-4 col-md-5">
+            <SummarySidebar/>    
+        </div>
     </div>
-</div>
+}
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+    private CartDTO CartDTO { get; set; }
+
+    private int AccountId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userOID = await this.GetUserOID();
+        this.AccountId = await this.GetAccountId(userOID);
+        this.CartDTO = await this.cartService.GetCartAsync(this.AccountId);
+    }
+
+    private async Task<int> GetAccountId(string userOID)
+    {
+        var account = await this.accountService.GetAccountAsync(userOID);
+
+        return account.Id;
+    }
+
+    private async Task<string> GetUserOID()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        var nameIdentifierClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+        var userOID = user.Claims
+            .FirstOrDefault(c => c.Type == nameIdentifierClaimType)?.Value;
+
+        return userOID;
+    }
+
+    public async Task RemoveProduct(CartProductDTO cartProductDTO)
+    {
+        await this.cartProductService.DeleteAsync(cartProductDTO);
+
+        this.toastService.ShowSuccess(
+            message: $"Item '{cartProductDTO.Product.Name}' has been removed from your shopping cart.",
+            heading: "Success");
+
+        this.CartDTO.CartProducts.Remove(cartProductDTO);
+    }
 }

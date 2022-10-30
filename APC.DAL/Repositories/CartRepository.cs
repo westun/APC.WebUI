@@ -20,6 +20,8 @@ namespace APC.DAL.Repositories
             return dbContext.Cart
                 .Include(c => c.Account)
                 .Include(c => c.CartProducts)
+                    .ThenInclude(cp => cp.Product)
+                        .ThenInclude(p => p.Type)
                 .FirstOrDefault(c => c.Id == accountId && !c.Completed);
         }
     }
