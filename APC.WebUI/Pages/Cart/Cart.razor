@@ -54,32 +54,9 @@ else
 
     private CartDTO CartDTO { get; set; }
 
-    private int AccountId { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        var userOID = await this.GetUserOID();
-        this.AccountId = await this.GetAccountId(userOID);
-        this.CartDTO = await this.cartService.GetCartAsync(this.AccountId);
-    }
-
-    private async Task<int> GetAccountId(string userOID)
-    {
-        var account = await this.accountService.GetAccountAsync(userOID);
-
-        return account.Id;
-    }
-
-    private async Task<string> GetUserOID()
-    {
-        var authState = await authenticationStateTask;
-        var user = authState.User;
-
-        var nameIdentifierClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-        var userOID = user.Claims
-            .FirstOrDefault(c => c.Type == nameIdentifierClaimType)?.Value;
-
-        return userOID;
+        this.CartDTO = await this.cartService.GetCartAsync(this.AppState.CurrentAccountId);
     }
 
     public async Task RemoveProduct(CartProductDTO cartProductDTO)
@@ -97,7 +74,7 @@ else
 
     public async Task ChangeQuantity(CartProductDTO cartProductDTO)
     {
-        var cart = await this.cartService.GetCartAsync(this.AccountId);
+        var cart = await this.cartService.GetCartAsync(this.AppState.CurrentAccountId);
 
         int currentQuantity = cart.CartProducts
             .FirstOrDefault(cp => cp.ProductId == cartProductDTO.ProductId

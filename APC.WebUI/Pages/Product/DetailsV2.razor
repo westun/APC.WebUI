@@ -133,8 +133,6 @@ else
     private CartDTO cartDTO { get; set; }
     private CartProductDTO cartProductDTO { get; set; }
 
-    private int accountId { get; set; }
-
     private int SelectedQuantity { get; set; } = 1;
 
     protected override async Task OnParametersSetAsync()
@@ -147,10 +145,7 @@ else
         this.compatibleProductsDTO =
             await this.compatibleProductsService.GetCompatibleProductsByProductIdAsync(this.ProductId);
 
-        var userOID = await this.GetUserOID();
-        var account = await this.accountService.GetAccountAsync(userOID);
-        this.cartDTO = await this.cartService.GetCartAsync(account.Id);
-        this.accountId = account.Id;
+        this.cartDTO = await this.cartService.GetCartAsync(this.AppState.CurrentAccountId);
 
         this.cartProductDTO = this.cartDTO.CartProducts
             .FirstOrDefault(cp => cp.ProductId == this.ProductId);
@@ -180,7 +175,7 @@ else
 
         if (this.cartProductDTO is null)
         {
-            this.cartDTO = await this.cartService.GetCartAsync(this.accountId);
+            this.cartDTO = await this.cartService.GetCartAsync(this.AppState.CurrentAccountId);
             this.cartProductDTO = this.cartDTO.CartProducts
                 .FirstOrDefault(cp => cp.ProductId == this.ProductId);
         }
@@ -191,18 +186,6 @@ else
 
         this.AppState.CartItemCount += this.SelectedQuantity;
         this.SelectedQuantity = 1;
-    }
-
-    private async Task<string> GetUserOID()
-    {
-        var authState = await authenticationStateTask;
-        var user = authState.User;
-
-        var nameIdentifierClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-        var userOID = user.Claims
-            .FirstOrDefault(c => c.Type == nameIdentifierClaimType)?.Value;
-
-        return userOID;
     }
 
     public void IncreaseQuantity()
