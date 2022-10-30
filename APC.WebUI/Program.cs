@@ -52,9 +52,9 @@ namespace APC.WebUI
 
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor()
-                .AddMicrosoftIdentityConsentHandler()
+                .AddMicrosoftIdentityConsentHandler();
             //to display errors in hosted site
-            .AddCircuitOptions(options => { options.DetailedErrors = true; });
+            //.AddCircuitOptions(options => { options.DetailedErrors = true; });
 
             builder.Services.AddDbContextFactory<APCContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
@@ -124,9 +124,22 @@ namespace APC.WebUI
                 //user is invalid, only users who have an account in the system
                 //matching email can access the site.
                 //TODO: sign out user and display error message
-                return;
+                //return;
 
                 //or create a new account while testing?
+                var newAccount = new Account
+                {
+                    Email = authClaims.EmailAddress,
+                    DisplayName = authClaims.DisplayName,
+                    FirstName = authClaims.FirstName,
+                    LastName = authClaims.LastName,
+                    ObjectIdentifier = authClaims.Objectidentifier,
+                };
+
+                dbContext.Account.Add(newAccount);
+                dbContext.SaveChanges();
+
+                account = newAccount;
             }
             
             var isMissingOID = account is not null 
