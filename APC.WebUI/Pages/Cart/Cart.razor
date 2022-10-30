@@ -27,13 +27,14 @@ else
                         <li class="list-group-item py-3 py-lg-0 px-0 ">
                             <CartItemList 
                                 CardProduct="cartProduct"
-                                RemoveProduct="RemoveProduct"/>
+                                RemoveProduct="RemoveProduct"
+                                ChangeQuantity="ChangeQuantity" />
                         </li>
                     }
                 </ul>
                 <div class="d-flex justify-content-between mt-4">
                     <a href="products/browse" class="btn btn-primary">Continue Shopping</a>
-                    <a href="#!" class="btn btn-dark">Update Cart</a>
+                    @*<a href="#!" class="btn btn-dark">Update Cart</a>*@
                 </div>
             </div>
         </div>
@@ -87,5 +88,14 @@ else
             heading: "Success");
 
         this.CartDTO.CartProducts.Remove(cartProductDTO);
+    }
+
+    public async Task ChangeQuantity(CartProductDTO cartProductDTO)
+    {
+        await this.cartProductService.UpdateAsync(cartProductDTO);
+
+        this.toastService.ShowSuccess(
+            message: $"Quantity for item '{cartProductDTO.Product.Name}' has be changed.",
+            heading: "Success");
     }
 }

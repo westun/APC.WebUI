@@ -28,10 +28,24 @@
         </div>
     </div>
     <div class="col-3 col-md-3 col-lg-2">
-        <div class="input-group input-spinner  ">
-            <input type="button" value="-" class="button-minus  btn  btn-sm " data-field="quantity">
+        <div class="input-group input-spinner">
+            @*<input type="button" value="-" class="button-minus  btn  btn-sm " data-field="quantity">
             <input type="number" step="1" max="10" value="1" name="quantity" class="quantity-field form-control-sm form-input   ">
-            <input type="button" value="+" class="button-plus btn btn-sm " data-field="quantity">
+            <input type="button" value="+" class="button-plus btn btn-sm " data-field="quantity">*@
+            <EditForm Model="this">
+                    @*@bind-Value="this.CardProduct.ProductQuantity" *@
+                <InputSelect 
+                    Value="this.CardProduct.ProductQuantity"
+                    ValueExpression="() => this.CardProduct.ProductQuantity"
+                    ValueChanged="((int args) => { this.CardProduct.ProductQuantity = args; ChangeProductQuantity(); })"
+                    class="form-select"
+                    @onchange="() => ChangeProductQuantity()">
+                    @foreach (var qty in Enumerable.Range(1, 50))
+                    {
+                        <option id="qty_product" value="@qty">@qty</option>
+                    }
+                </InputSelect>
+            </EditForm>
         </div>
     </div>
     <div class="col-2 text-lg-end text-start text-md-end col-md-2">
@@ -46,8 +60,16 @@
     [Parameter]
     public EventCallback<CartProductDTO> RemoveProduct { get; set; }
 
+    [Parameter]
+    public EventCallback<CartProductDTO> ChangeQuantity { get; set; }
+
     public async Task RemoveCartProduct()
     {
         await this.RemoveProduct.InvokeAsync(this.CardProduct);
+    }
+
+    public async Task ChangeProductQuantity()
+    { 
+        await this.ChangeQuantity.InvokeAsync(this.CardProduct);
     }
 }

@@ -33,6 +33,21 @@ namespace APC.DAL.Repositories
             }
         }
 
+        public async Task UpdateAsync(CartProduct cartProduct)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            var cartProductFromDB = dbContext.CartProducts
+                .FirstOrDefault(sp => sp.ProductId == cartProduct.ProductId
+                    && sp.CartId == cartProduct.CartId);
+            if (cartProductFromDB is not null)
+            {
+                cartProductFromDB.ProductQuantity = cartProduct.ProductQuantity;
+
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
         public async Task DeleteAsync(CartProduct cartProduct)
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
