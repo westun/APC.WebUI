@@ -116,6 +116,7 @@ namespace APC.WebUI
             optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("default"));
             APCContext dbContext = new APCContext(optionsBuilder.Options);
 
+            //TODO: update to match on OID instead of email?
             var account = dbContext.Account
                 .FirstOrDefault(a => a.Email.ToLower() == (authClaims.EmailAddress ?? "").ToLower());
 
