@@ -8,6 +8,7 @@ namespace APC.WebUI.Services
     {
         private const string ConnectionString = "DefaultEndpointsProtocol=https;AccountName=apcdevelopment;AccountKey=lZdasgvG5mXWdFn5VXRPsuPNsziS2H+T0lTrtsax//PJBil6YmhbRhiSMWuCykfcdsu3/HUhYrsP+ASthiVXlQ==;EndpointSuffix=core.windows.net";
         private const string BlobContainerName = "brochure";
+        private const int MaxAllowedFileSize = 1024000;
 
         public async Task<FileUploadResultDTO> UploadFile(FileUploadDataDTO fileUploadData)
         {
@@ -15,7 +16,7 @@ namespace APC.WebUI.Services
                 = new BlobContainerClient(ConnectionString, BlobContainerName);
 
             BlobClient blobClient = containerClient.GetBlobClient(fileUploadData.FileName);
-            await blobClient.UploadAsync(fileUploadData.BrowserFile.OpenReadStream());
+            await blobClient.UploadAsync(fileUploadData.BrowserFile.OpenReadStream(MaxAllowedFileSize));
 
             var headers = await this.ConfigureBlobContentType(blobClient, fileUploadData.BrowserFile.ContentType);
             await blobClient.SetHttpHeadersAsync(headers);
