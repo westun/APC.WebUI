@@ -12,8 +12,7 @@ namespace APC.WebUI.Authentication.EventHandlers
     {
         private readonly IDbContextFactory<APCContext> dbContextFactory;
 
-        public OnTicketReceived(
-            IDbContextFactory<APCContext> dbContextFactory)
+        public OnTicketReceived(IDbContextFactory<APCContext> dbContextFactory)
         {
             this.dbContextFactory = dbContextFactory;
         }
