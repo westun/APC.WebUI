@@ -134,36 +134,7 @@ namespace APC.WebUI
             var account = dbContext.Account
                 .FirstOrDefault(a => a.Email.ToLower() == (authClaims.EmailAddress ?? "").ToLower());
 
-            if (account is null)
-            {
-                //user is invalid, only users who have an account in the system
-                //matching email can access the site.
-                //TODO: sign out user and display error message
-                //return;
-
-                //or create a new account while testing?
-                var newAccount = new Account
-                {
-                    Email = authClaims.EmailAddress,
-                    DisplayName = authClaims.DisplayName,
-                    FirstName = authClaims.FirstName,
-                    LastName = authClaims.LastName,
-                    ObjectIdentifier = authClaims.Objectidentifier,
-                };
-
-                dbContext.Account.Add(newAccount);
-                dbContext.SaveChanges();
-
-                account = newAccount;
-            }
-            
-            var isMissingOID = account is not null 
-                && string.IsNullOrEmpty(account.ObjectIdentifier);
-            if (isMissingOID)
-            {
-                account.ObjectIdentifier = authClaims.Objectidentifier;
-                dbContext.SaveChanges();
-            }
+            account = SaveAccount(dbContext, account, authClaims);
 
             //create shopping cart for account if one doesn't exist that is not completed
             CreateShoppingCart(dbContext, account.Id);
@@ -213,6 +184,42 @@ namespace APC.WebUI
                 c => c.Type == "idp_access_token")?.Value;
 
             return authClaims;
+        }
+
+        private static Account SaveAccount(APCContext dbContext, Account account, AuthClaims authClaims)
+        {
+            if (account is null)
+            {
+                //user is invalid, only users who have an account in the system
+                //matching email can access the site.
+                //TODO: sign out user and display error message
+                //return;
+
+                //or create a new account while testing?
+                var newAccount = new Account
+                {
+                    Email = authClaims.EmailAddress,
+                    DisplayName = authClaims.DisplayName,
+                    FirstName = authClaims.FirstName,
+                    LastName = authClaims.LastName,
+                    ObjectIdentifier = authClaims.Objectidentifier,
+                };
+
+                dbContext.Account.Add(newAccount);
+                dbContext.SaveChanges();
+
+                return newAccount;
+            }
+
+            var isMissingOID = account is not null
+                && string.IsNullOrEmpty(account.ObjectIdentifier);
+            if (isMissingOID)
+            {
+                account.ObjectIdentifier = authClaims.Objectidentifier;
+                dbContext.SaveChanges();
+            }
+
+            return account;
         }
         
         private static void CreateShoppingCart(APCContext dbContext, int accountId)
