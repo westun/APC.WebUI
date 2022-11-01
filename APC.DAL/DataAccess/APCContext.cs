@@ -36,6 +36,7 @@ namespace APC.DAL.DataAccess
         public DbSet<CompatibleProducts> CompatibleProducts { get; set; }
         public DbSet<Cart> Cart { get; set; }
         public DbSet<CartProduct> CartProducts { get; set; }
+        public DbSet<Role> Role { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
