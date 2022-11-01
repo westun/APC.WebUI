@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Logging;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Dynamic.Core;
 using System.Security.Claims;
 
@@ -26,15 +27,22 @@ namespace APC.WebUI
                 .AddMicrosoftIdentityWebApp(options =>
                 {
                     builder.Configuration.Bind("AzureAd", options);
-
                     options.Events = new OpenIdConnectEvents
                     {
-                        OnTicketReceived = async ctxt => 
-                        { 
+                        OnTicketReceived = async ctxt =>
+                        {
                             await OnTicketReceived(ctxt, builder);
                         }
                     };
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        NameClaimType = "name",
+                        RoleClaimType = "myroles"
+                    };
                 });
+
+            //set claims to use shortened names
+            JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
             builder.Services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
@@ -44,10 +52,10 @@ namespace APC.WebUI
                 // By default, all incoming requests will be authorized according to the default policy
                 options.FallbackPolicy = options.DefaultPolicy;
 
-                //TODO: configurate admin authorization
-                var authAdminRequirement = new RolesAuthorizationRequirement(new string[] { "Admin" });
-                options.AddPolicy("admin-policy", policy =>
-                    policy.Requirements.Add(authAdminRequirement));
+                //this is not required, you can just use roles, unless you want policy based authentication to allow multiple requirements
+                //var authAdminRequirement = new RolesAuthorizationRequirement(new string[] { "admin" });
+                //options.AddPolicy("admin-policy", policy =>
+                //    policy.Requirements.Add(authAdminRequirement));
             });
 
             builder.Services.AddRazorPages();
@@ -110,11 +118,13 @@ namespace APC.WebUI
                 return;
             }
 
-            var authClaims = await GetAuthClaims(ctxt.Principal.Claims);
-
+            //init dbcontext
             var optionsBuilder = new DbContextOptionsBuilder<APCContext>();
             optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("default"));
             APCContext dbContext = new APCContext(optionsBuilder.Options);
+            //
+
+            var authClaims = await GetAuthClaims(ctxt.Principal.Claims);
 
             //TODO: update to match on OID instead of email?
             var account = dbContext.Account
@@ -153,6 +163,8 @@ namespace APC.WebUI
 
             //create shopping cart for account if one doesn't exist that is not completed
             CreateShoppingCart(dbContext, account.Id);
+
+            AddRoleClaims(ctxt, account, dbContext);
 
             await Task.Yield();
         }
@@ -208,6 +220,25 @@ namespace APC.WebUI
                 var newCart = new Cart { AccountId = accountId };
                 dbContext.Cart.Add(newCart);
                 dbContext.SaveChanges();
+            }
+        }
+
+        private static void AddRoleClaims(TicketReceivedContext ctxt, Account account, APCContext dbContext)
+        {
+            var accountId = account.Id;
+            var rolesFromDB = dbContext.Role
+                .Where(r => r.Accounts.Any(a => a.Id == accountId))
+                .ToList();
+
+            if (rolesFromDB.Any())
+            {
+                var roles = string.Join(",", rolesFromDB.Select(r => r.Name));
+
+                var newClaims = new List<Claim> { new Claim("myroles", roles) };
+                ClaimsIdentity claimsIdentity
+                    = new ClaimsIdentity(newClaims, "AuthenticationTypes.Federation", "name", "myroles");
+
+                ctxt.Principal.AddIdentity(claimsIdentity);
             }
         }
     }
