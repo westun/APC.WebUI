@@ -1,4 +1,5 @@
-﻿@page "/admin/product/new"
+﻿@attribute [Authorize(Roles = "admin")]
+@page "/admin/product/new"
 @page "/admin/product/{productId:int}"
 @using APC.WebUI.Pages.Admin.Components;
 

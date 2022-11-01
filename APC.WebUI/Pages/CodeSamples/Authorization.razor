@@ -1,18 +1,39 @@
-﻿@*@attribute [Authorize("adminPolicy")]*@
-@page "/authorize/test"
+﻿@page "/authorize/test"
+@attribute [Authorize(Roles = "admin")]
+@using System.Security.Claims
 @inject AuthenticationStateProvider authenticationStateProvider 
 
 <h3>Authorization</h3>
 
-<AuthorizeView Policy="admin-policy" Roles="Admin">
+@*Policy="admin-policy"*@
+<AuthorizeView Roles="admin">
     You can see this if you're an admin.
 </AuthorizeView>
+
+@if (this.UserIsAdmin)
+{
+    <div class="mt-5">
+        User has the role Admin
+    </div>
+}
+
+<div class="mt-5">
+    @foreach (var claim in Claims)
+    {
+        <div>
+            Type: @claim.Type | Value: @claim.Value
+        </div>
+    }
+</div>
 
 @code {
     //option2
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; } 
 
+    private IEnumerable<Claim> Claims { get; set; }
+
+    private bool UserIsAdmin { get; set; }
 
     //option 1
     //protected override async Task OnInitializedAsync()
@@ -31,11 +52,18 @@
         var authState = await authenticationStateTask;
         var user = authState.User;
 
+        this.Claims = authState.User.Claims;
+
         var userEmail = user.Claims
             .FirstOrDefault(c => c.Type == "emails")?.Value;
 
         var nameIdentifierClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
         var userOID = user.Claims
             .FirstOrDefault(c => c.Type == nameIdentifierClaimType)?.Value;
+
+        if (user.IsInRole("admin"))
+        {
+            this.UserIsAdmin = true;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿@page "/admin/attribute"
+﻿@attribute [Authorize(Roles = "admin")]
+@page "/admin/attribute"
 @inject IProductAttributeService productAttributeService
 @inject IToastService toastService
 
