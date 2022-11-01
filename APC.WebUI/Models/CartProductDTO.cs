@@ -1,6 +1,4 @@
-﻿using APC.DAL.Models;
-
-namespace APC.WebUI.Models
+﻿namespace APC.WebUI.Models
 {
     public class CartProductDTO
     {
@@ -9,7 +7,7 @@ namespace APC.WebUI.Models
         public int ProductId { get; set; }
         public int ProductQuantity { get; set; }
 
-        public Cart Cart { get; set; }
-        public Product Product { get; set; }
+        public CartDTO Cart { get; set; }
+        public ProductDTO Product { get; set; }
     }
 }
