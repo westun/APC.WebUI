@@ -23,5 +23,10 @@ namespace APC.WebUI.Services
 
             return this.mapper.Map<CartDTO>(cart);
         }
+
+        public async Task CompleteCartAsync(int cartId)
+        {
+            await this.cartRepository.CompleteCartAsync(cartId);
+        }
     }
 }

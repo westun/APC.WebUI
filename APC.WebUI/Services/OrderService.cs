@@ -1,0 +1,30 @@
+﻿using APC.DAL.Models;
+using APC.DAL.Repositories;
+using APC.WebUI.Models;
+using AutoMapper;
+
+namespace APC.WebUI.Services
+{
+    public class OrderService : IOrderService
+    {
+        private readonly IOrderRepository orderRepository;
+        private readonly IMapper mapper;
+
+        public OrderService(
+            IOrderRepository orderRepository,
+            IMapper mapper)
+        {
+            this.orderRepository = orderRepository;
+            this.mapper = mapper;
+        }
+
+        public async Task<OrderDTO> SaveOrderAsync(OrderDTO orderDTO)
+        {
+            var order = this.mapper.Map<Order>(orderDTO);
+
+            var orderFromDB = await this.orderRepository.SaveAsync(order);
+
+            return this.mapper.Map<OrderDTO>(orderFromDB);
+        }
+    }
+}

@@ -40,6 +40,12 @@ namespace APC.WebUI.Configuration.AutoMapperProfiles
 
             this.CreateMap<CartProduct, CartProductDTO>()
                 .ReverseMap();
+
+            this.CreateMap<Order, OrderDTO>()
+                .ReverseMap();
+
+            this.CreateMap<OrderItem, OrderItemDTO>()
+                .ReverseMap();
         }
     }
 }

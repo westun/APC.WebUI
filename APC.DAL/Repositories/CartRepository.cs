@@ -24,5 +24,17 @@ namespace APC.DAL.Repositories
                         .ThenInclude(p => p.Type)
                 .FirstOrDefault(c => c.AccountId == accountId && !c.Completed);
         }
+
+        public async Task CompleteCartAsync(int cartId)
+        {
+            var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            var cartFromDB = dbContext.Cart.FirstOrDefault(c => c.Id == cartId);
+            if (cartFromDB is not null)
+            {
+                cartFromDB.Completed = true;
+                dbContext.SaveChanges();
+            }
+        }
     }
 }
