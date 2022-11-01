@@ -5,11 +5,11 @@
 
 <div class="page">
     <main>
-        @*<AuthorizeView Policy="admin-policy">*@
-            <div hidden>
+        <AuthorizeView Roles="admin">
+            <div>
                 <AdminNavbar></AdminNavbar>
             </div>
-        @*</AuthorizeView>*@
+        </AuthorizeView>
         <div>
             <Navbar />
         </div>
