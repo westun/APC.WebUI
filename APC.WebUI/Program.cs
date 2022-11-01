@@ -18,6 +18,8 @@ namespace APC.WebUI
 {
     public class Program
     {
+        private const string RoleClaimType = "roles";
+
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -34,11 +36,13 @@ namespace APC.WebUI
                             await OnTicketReceived(ctxt, builder);
                         }
                     };
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                    {
-                        NameClaimType = "name",
-                        RoleClaimType = "myroles"
-                    };
+                    //this isn't working for me as it's suppose to,
+                    //could be because there are no roles in claims returned from authenticating
+                    //options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    //{
+                    //    NameClaimType = "name",
+                    //    RoleClaimType = RoleClaimType
+                    //};
                 });
 
             //set claims to use shortened names
@@ -234,9 +238,9 @@ namespace APC.WebUI
             {
                 var roles = string.Join(",", rolesFromDB.Select(r => r.Name));
 
-                var newClaims = new List<Claim> { new Claim("myroles", roles) };
+                var newClaims = new List<Claim> { new Claim(RoleClaimType, roles) };
                 ClaimsIdentity claimsIdentity
-                    = new ClaimsIdentity(newClaims, "AuthenticationTypes.Federation", "name", "myroles");
+                    = new ClaimsIdentity(newClaims, "AuthenticationTypes.Federation", "name", RoleClaimType);
 
                 ctxt.Principal.AddIdentity(claimsIdentity);
             }
