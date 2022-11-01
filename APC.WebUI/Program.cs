@@ -1,25 +1,18 @@
 using APC.DAL.DataAccess;
-using APC.DAL.Models;
+using APC.WebUI.Authentication.EventHandlers;
 using APC.WebUI.Configuration;
-using APC.WebUI.Models;
 using Blazored.Toast;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Logging;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq.Dynamic.Core;
-using System.Security.Claims;
 
 namespace APC.WebUI
 {
     public class Program
     {
-        private const string RoleClaimType = "roles";
-
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -31,18 +24,18 @@ namespace APC.WebUI
                     builder.Configuration.Bind("AzureAd", options);
                     options.Events = new OpenIdConnectEvents
                     {
-                        OnTicketReceived = async ctxt =>
+                        OnTicketReceived = async context =>
                         {
-                            await OnTicketReceived(ctxt, builder);
+                            var serviceProvider = builder.Services.BuildServiceProvider();
+                            var onTicketReceived = serviceProvider.GetService<IOnTicketReceived>();
+                            await onTicketReceived.Execute(context);
                         }
                     };
-                    //this isn't working for me as it's suppose to,
-                    //could be because there are no roles in claims returned from authenticating
-                    //options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                    //{
-                    //    NameClaimType = "name",
-                    //    RoleClaimType = RoleClaimType
-                    //};
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        NameClaimType = "name", //doesn't work
+                        RoleClaimType = "roles"
+                    };
                 });
 
             //set claims to use shortened names
@@ -79,6 +72,8 @@ namespace APC.WebUI
 
             builder.Services.AddDalRepositories();
             builder.Services.AddDalServices();
+            
+            builder.Services.AddTransient<IOnTicketReceived, OnTicketReceived>();
 
             var app = builder.Build();
 
@@ -109,148 +104,6 @@ namespace APC.WebUI
             app.MapFallbackToPage("/_Host");
 
             app.Run();
-        }
-
-        private static async Task OnTicketReceived(
-            TicketReceivedContext ctxt,
-            WebApplicationBuilder builder)
-        {
-            if (ctxt.Principal == null
-                || ctxt.Principal.Identity is not ClaimsIdentity identity)
-            {
-                await Task.Yield();
-                return;
-            }
-
-            //init dbcontext
-            var optionsBuilder = new DbContextOptionsBuilder<APCContext>();
-            optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("default"));
-            APCContext dbContext = new APCContext(optionsBuilder.Options);
-            //
-
-            var authClaims = await GetAuthClaims(ctxt.Principal.Claims);
-
-            //TODO: update to match on OID instead of email?
-            var account = dbContext.Account
-                .FirstOrDefault(a => a.Email.ToLower() == (authClaims.EmailAddress ?? "").ToLower());
-
-            account = SaveAccount(dbContext, account, authClaims);
-
-            //create shopping cart for account if one doesn't exist that is not completed
-            CreateShoppingCart(dbContext, account.Id);
-
-            AddRoleClaims(ctxt, account, dbContext);
-
-            await Task.Yield();
-        }
-
-        private static async Task<AuthClaims> GetAuthClaims(IEnumerable<Claim> claims)
-        {
-            AuthClaims authClaims = new AuthClaims();
-
-            var colClaims = await claims.ToDynamicListAsync();
-
-            authClaims.IdentityProvider = colClaims.FirstOrDefault(
-                c => c.Type == "http://schemas.microsoft.com/identity/claims/identityprovider")?.Value;
-
-            authClaims.Objectidentifier = colClaims.FirstOrDefault(
-                c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
-
-            authClaims.EmailAddress = colClaims.FirstOrDefault(
-                c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
-
-            if (string.IsNullOrEmpty(authClaims.EmailAddress))
-            {
-                authClaims.EmailAddress = colClaims.FirstOrDefault(
-                c => c.Type == "emails")?.Value;
-            }
-
-            authClaims.FirstName = colClaims.FirstOrDefault(
-                c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value;
-
-            authClaims.LastName = colClaims.FirstOrDefault(
-                c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value;
-
-            authClaims.AzureB2CFlow = colClaims.FirstOrDefault(
-                c => c.Type == "http://schemas.microsoft.com/claims/authnclassreference")?.Value;
-
-            authClaims.auth_time = colClaims.FirstOrDefault(
-                c => c.Type == "auth_time")?.Value;
-
-            authClaims.DisplayName = colClaims.FirstOrDefault(
-                c => c.Type == "name")?.Value;
-
-            authClaims.idp_access_token = colClaims.FirstOrDefault(
-                c => c.Type == "idp_access_token")?.Value;
-
-            return authClaims;
-        }
-
-        private static Account SaveAccount(APCContext dbContext, Account account, AuthClaims authClaims)
-        {
-            if (account is null)
-            {
-                //user is invalid, only users who have an account in the system
-                //matching email can access the site.
-                //TODO: sign out user and display error message
-                //return;
-
-                //or create a new account while testing?
-                var newAccount = new Account
-                {
-                    Email = authClaims.EmailAddress,
-                    DisplayName = authClaims.DisplayName,
-                    FirstName = authClaims.FirstName,
-                    LastName = authClaims.LastName,
-                    ObjectIdentifier = authClaims.Objectidentifier,
-                };
-
-                dbContext.Account.Add(newAccount);
-                dbContext.SaveChanges();
-
-                return newAccount;
-            }
-
-            var isMissingOID = account is not null
-                && string.IsNullOrEmpty(account.ObjectIdentifier);
-            if (isMissingOID)
-            {
-                account.ObjectIdentifier = authClaims.Objectidentifier;
-                dbContext.SaveChanges();
-            }
-
-            return account;
-        }
-        
-        private static void CreateShoppingCart(APCContext dbContext, int accountId)
-        {
-            var cart = dbContext.Cart
-                .FirstOrDefault(c => c.AccountId == accountId && !c.Completed);
-            if (cart is null)
-            {
-                var newCart = new Cart { AccountId = accountId };
-                dbContext.Cart.Add(newCart);
-                dbContext.SaveChanges();
-            }
-        }
-
-        private static void AddRoleClaims(TicketReceivedContext ctxt, Account account, APCContext dbContext)
-        {
-            var accountId = account.Id;
-            var rolesFromDB = dbContext.Role
-                .Where(r => r.Accounts.Any(a => a.Id == accountId))
-                .ToList();
-
-            if (rolesFromDB.Any())
-            {
-                var roles = string.Join(",", rolesFromDB.Select(r => r.Name));
-
-                var newClaims = new List<Claim> { new Claim(RoleClaimType, roles) };
-                ClaimsIdentity claimsIdentity
-                    = new ClaimsIdentity(newClaims, "AuthenticationTypes.Federation", "name", RoleClaimType);
-
-                ctxt.Principal.AddIdentity(claimsIdentity);
-            }
         }
     }
 }
