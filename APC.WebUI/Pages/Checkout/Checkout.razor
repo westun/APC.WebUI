@@ -3,7 +3,7 @@
 @inject IOrderService orderService
 @inject NavigationManager navigationManager
 
-@if (this.CartProducts is null || this.SaveInProgress)
+@if (this.CartProducts is null)
 {
     <Spinner/>
 }
@@ -51,11 +51,22 @@ else
                             </div>
                         </div>
                         <div class="mt-5 d-flex justify-content-end">
-                            <a href="cart" class="btn btn-outline-gray-400 text-muted">
-                                Back to Cart
-                            </a>
-                            <button @onclick="PlaceOrder" class="btn btn-primary ms-2">
-                                Place Order
+                            @if (!this.SaveInProgress)
+                            {
+                                <a href="cart" class="btn btn-outline-gray-400 text-muted">
+                                    Back to Cart
+                                </a>
+                            }
+                            <button type="button" @onclick="PlaceOrder" disabled="@this.SaveInProgress" class="btn btn-primary ms-2">
+                                @if (this.SaveInProgress)
+                                {
+                                    @:Placing Order...
+                                    <span class="spinner-border align-middle"></span>
+                                }
+                                else
+                                {
+                                    @:Place Order
+                                }
                             </button>
                         </div>
                     </div>
@@ -84,15 +95,18 @@ else
 
         this.CartProducts = cart.CartProducts;
         this.CartId = cart.Id;
+
+        if (!this.CartProducts.Any())
+        {
+            this.navigationManager.NavigateTo("cart");
+        }
     }
 
     private async Task PlaceOrder()
     {
-        //display spinner
         this.SaveInProgress = true;
-        this.StateHasChanged();
+        await Task.Delay(1); //"flush changes" to cause page to rerender when SaveInProgress changes https://stackoverflow.com/questions/56604886/display-wait-or-spinner-on-api-call
 
-        //construct order
         var order = new OrderDTO
         {
             AccountId = this.AppState.CurrentAccountId,
@@ -105,13 +119,17 @@ else
             }).ToList(),
         };
 
-        //save order
         await this.orderService.SaveOrderAsync(order);
 
-        //complete cart, and create a new one
         await this.cartService.CompleteCartAsync(this.CartId);
 
-        //navigate to order complete page
+        await this.cartService.CreateCartAsync(new CartDTO 
+        { 
+            AccountId = this.AppState.CurrentAccountId 
+        });
+
+        this.AppState.CartItemCount = 0;
+
         this.navigationManager.NavigateTo("order/complete");
 
         this.SaveInProgress = false;

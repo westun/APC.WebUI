@@ -6,5 +6,6 @@ namespace APC.WebUI.Services
     {
         Task<CartDTO> GetCartAsync(int accountId);
         Task CompleteCartAsync(int cartId);
+        Task CreateCartAsync(CartDTO cartDTO);
     }
 }

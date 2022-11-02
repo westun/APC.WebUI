@@ -36,5 +36,22 @@ namespace APC.DAL.Repositories
                 dbContext.SaveChanges();
             }
         }
+
+        public async Task CreateAsync(Cart cart)
+        {
+            if (cart is null)
+            {
+                throw new ArgumentNullException(nameof(cart));
+            }
+
+            var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            var cartFromDB = dbContext.Cart.FirstOrDefault(c => c.Id == cart.Id);
+            if (cartFromDB is null)
+            {
+                dbContext.Cart.Add(cart);
+                await dbContext.SaveChangesAsync();    
+            }
+        }
     }
 }

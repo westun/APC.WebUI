@@ -33,9 +33,9 @@ namespace APC.WebUI.Authentication.EventHandlers
             var account = dbContext.Account
                 .FirstOrDefault(a => a.Email.ToLower() == (authClaims.EmailAddress ?? "").ToLower());
 
-            account = this.SaveAccount(dbContext, account, authClaims);
+            account = await this.SaveAccount(dbContext, account, authClaims);
 
-            this.CreateShoppingCart(dbContext, account.Id);
+            await this.CreateShoppingCart(dbContext, account.Id);
 
             this.AddRoleClaims(dbContext, principal, account);
         }
@@ -73,7 +73,7 @@ namespace APC.WebUI.Authentication.EventHandlers
             return authClaims;
         }
 
-        private Account SaveAccount(APCContext dbContext, Account account, AuthClaims authClaims)
+        private async Task<Account> SaveAccount(APCContext dbContext, Account account, AuthClaims authClaims)
         {
             if (account is null)
             {
@@ -94,7 +94,7 @@ namespace APC.WebUI.Authentication.EventHandlers
                 };
 
                 dbContext.Account.Add(newAccount);
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
 
                 return newAccount;
             }
@@ -104,13 +104,13 @@ namespace APC.WebUI.Authentication.EventHandlers
             if (isMissingOID)
             {
                 account.ObjectIdentifier = authClaims.Objectidentifier;
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
 
             return account;
         }
 
-        private void CreateShoppingCart(APCContext dbContext, int accountId)
+        private async Task CreateShoppingCart(APCContext dbContext, int accountId)
         {
             var cart = dbContext.Cart
                 .FirstOrDefault(c => c.AccountId == accountId && !c.Completed);
@@ -118,7 +118,7 @@ namespace APC.WebUI.Authentication.EventHandlers
             {
                 var newCart = new Cart { AccountId = accountId };
                 dbContext.Cart.Add(newCart);
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
         }
 

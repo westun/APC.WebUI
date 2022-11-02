@@ -41,7 +41,7 @@ namespace APC.DAL.Repositories
             if (orderFromDB is null)
             {
                 dbContext.Add(order);
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
 
                 return order;
             }

@@ -6,5 +6,6 @@ namespace APC.DAL.Repositories
     {
         Task<Cart> GetAsync(int accountId);
         Task CompleteCartAsync(int cartId);
+        Task CreateAsync(Cart cart);
     }
 }

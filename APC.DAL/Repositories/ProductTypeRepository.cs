@@ -29,7 +29,7 @@ namespace APC.DAL.Repositories
             if (productTypeFromDB is null)
             {
                 dbContext.ProductTypes.Add(productType);
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
 
                 return productType;
             }
