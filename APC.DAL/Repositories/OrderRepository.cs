@@ -13,6 +13,17 @@ namespace APC.DAL.Repositories
             this.dbContextFactory = dbContextFactory;
         }
 
+        public async Task<Order> GetAsync(int orderId)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            return dbContext.Order
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                        .ThenInclude(p => p.Type)
+                .FirstOrDefault(o => o.Id == orderId);
+        }
+
         public async Task<Order> SaveAsync(Order order)
         {
             if (order is null)

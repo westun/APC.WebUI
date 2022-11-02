@@ -26,9 +26,12 @@ else
                         <div class="accordion-item py-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <a href="#" class="fs-5 text-inherit collapsed h4" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="true" aria-controls="flush-collapseOne">
-                                    <i class="feather-icon icon-map-pin me-2 text-muted"></i>Select delivery address
+                                    <i class="feather-icon icon-map-pin me-2 text-muted"></i>
+                                    Select delivery address
                                 </a>
-                                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">Add a new address </button>
+                                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                                    Add a new address
+                                </button>
                             </div>
                             <div id="flush-collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                                 <AddressSelection />
@@ -107,7 +110,7 @@ else
         this.SaveInProgress = true;
         await Task.Delay(1); //"flush changes" to cause page to rerender when SaveInProgress changes https://stackoverflow.com/questions/56604886/display-wait-or-spinner-on-api-call
 
-        var order = new OrderDTO
+        var orderDTO = new OrderDTO
         {
             AccountId = this.AppState.CurrentAccountId,
             Created = DateTimeOffset.UtcNow,
@@ -119,7 +122,7 @@ else
             }).ToList(),
         };
 
-        await this.orderService.SaveOrderAsync(order);
+        var order = await this.orderService.SaveOrderAsync(orderDTO);
 
         await this.cartService.CompleteCartAsync(this.CartId);
 
@@ -130,7 +133,7 @@ else
 
         this.AppState.CartItemCount = 0;
 
-        this.navigationManager.NavigateTo("order/complete");
+        this.navigationManager.NavigateTo($"order/{order.Id}/complete");
 
         this.SaveInProgress = false;
     }

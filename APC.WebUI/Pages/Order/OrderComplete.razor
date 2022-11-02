@@ -1,7 +1,31 @@
-﻿@page "/order/complete"
+﻿@page "/order/{orderid:int}/complete"
+@inject IOrderService orderService
+@using APC.WebUI.Pages.Order.Components
 
-<h3>Your order is complete</h3>
+
+@if (this.OrderItems is null)
+{
+    <Spinner/>
+}
+else
+{
+    <h3>Your order is complete</h3>
+
+    <div class="mt-3">
+        <OrderCompletedDetails OrderItems="this.OrderItems"/>
+    </div>
+}
 
 @code {
+    [Parameter]
+    public int OrderId { get; set; }
 
+    private IEnumerable<OrderItemDTO> OrderItems { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var order = await this.orderService.GetOrderAsync(this.OrderId);
+
+        this.OrderItems = order.OrderItems;
+    }
 }

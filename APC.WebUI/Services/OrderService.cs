@@ -18,6 +18,13 @@ namespace APC.WebUI.Services
             this.mapper = mapper;
         }
 
+        public async Task<OrderDTO> GetOrderAsync(int orderId)
+        {
+            var order = await this.orderRepository.GetAsync(orderId);
+
+            return this.mapper.Map<OrderDTO>(order);
+        }
+
         public async Task<OrderDTO> SaveOrderAsync(OrderDTO orderDTO)
         {
             var order = this.mapper.Map<Order>(orderDTO);
