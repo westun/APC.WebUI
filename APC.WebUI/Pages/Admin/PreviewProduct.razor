@@ -1,5 +1,6 @@
 ﻿@attribute [Authorize(Roles = "admin")]
 @page "/admin/product/{productId:int}/preview"
+@using APC.WebUI.Pages.Admin.Components;
 @inject IProductService productService
 @inject ISimilarProductsService similarProductsService
 @inject ICompatibleProductsService compatibleProductsService
@@ -44,8 +45,14 @@ else
                         </small>
                     </span>
                 </div>
+                <div>
+                    <a href="admin/product/@this.ProductId/" class="btn btn-primary">Edit</a>
+                </div>
                 <hr class="my-6">
-                <h3>Product Info</h3>
+                <h3>
+                    Product Info
+                    <a href="admin/product/@this.ProductId/attribute" class="btn btn-primary">Edit</a>
+                </h3>
                 <div>
                     <table class="table table-borderless">
                         <tbody>
@@ -70,7 +77,10 @@ else
                 }
                 <hr class="my-6" />
                 <div>
-                    <h3>Areas of Application</h3>
+                    <h3>
+                        Areas of Application 
+                        <a href="admin/product/@this.ProductId/areasofapplication" class="btn btn-primary">Edit</a>
+                    </h3>
                     @foreach (var aoa in this.product.AreasOfApplications)
                     {
                         <span class="badge text-bg-light-warning me-3 mb-3 py-2 px-5">@aoa.Name</span>
@@ -81,10 +91,14 @@ else
     </div>
 
     <div class="mb-5 mt-3">
-        <CompatibleProductDetail CompatibleProductsDTO="this.compatibleProductsDTO" />
+        <CompatibleProductAdminDetail 
+            CompatibleProductsDTO="this.compatibleProductsDTO"
+            ProductId="this.ProductId" />
     </div>
 
-    <SimilarProductDetail SimilarProductsDTO="this.similarProductsDTOs" />
+    <SimilarProductAdminDetail 
+        SimilarProductsDTO="this.similarProductsDTOs"
+        ProductId="this.ProductId" />
 
     <div class="mb-5"></div>
 }

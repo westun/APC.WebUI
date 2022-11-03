@@ -1,0 +1,35 @@
+﻿<div class="row">
+    <div class="col-sm-12">
+        <h3>
+            Products that are compatible 
+            <a href="admin/product/@this.ProductId/compatible" class="btn btn-primary">Edit</a>
+        </h3>
+    </div>
+</div>
+<div class="row g-4 row-cols-lg-5 row-cols-2 row-cols-md-3 mt-2">
+    @if (!this.CompatibleProductsDTO.Any())
+    {
+        <div>There are no compatible produtcts</div>
+    }
+    @foreach (var sp in this.CompatibleProductsDTO)
+    {
+        <div class="col">
+            <a href="products/detail/@sp.CompatibleProductId" class="text-decoration-none text-inherit">
+                <div class="card card-product">
+                    <div class="card-body text-center py-8">
+                        <img src="@sp.CompatibleProduct.ImageUrl" class="w-75 h-75 mb-3" />
+                        <div class="text-truncate">@sp.CompatibleProduct.Name</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<CompatibleProductsDTO> CompatibleProductsDTO { get; set; }
+
+    [Parameter]
+    public int ProductId { get; set; }
+}

@@ -1,0 +1,35 @@
+﻿<div class="row">
+    <div class="col-sm-12">
+        <h3>
+            Products that are similar
+            <a href="admin/product/@this.ProductId/similar" class="btn btn-primary">Edit</a>
+        </h3>
+    </div>
+</div>
+<div class="row g-4 row-cols-lg-5 row-cols-2 row-cols-md-3 mt-2">
+    @if (!this.SimilarProductsDTO.Any())
+    {
+        <div>There are no similar produtcts</div>
+    }
+    @foreach (var sp in this.SimilarProductsDTO)
+    {
+        <div class="col">
+            <a href="products/detail/@sp.SimilarProductId" class="text-decoration-none text-inherit">
+                <div class="card card-product">
+                    <div class="card-body text-center py-8">
+                        <img src="@sp.SimiliarProduct.ImageUrl" class="w-75 h-75 mb-3" />
+                        <div class="text-truncate">@sp.SimiliarProduct.Name</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<SimilarProductsDTO> SimilarProductsDTO { get; set; }
+
+    [Parameter]
+    public int ProductId { get; set; }
+}
