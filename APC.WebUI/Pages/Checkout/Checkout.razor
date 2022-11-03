@@ -114,6 +114,7 @@ else
         {
             AccountId = this.AppState.CurrentAccountId,
             Created = DateTimeOffset.UtcNow,
+            CartId = this.CartId,
             OrderItems = this.CartProducts.Select(cp => new OrderItemDTO
             {
                 Cost = 12.99m, //dummy data
