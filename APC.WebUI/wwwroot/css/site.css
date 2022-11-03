@@ -78,3 +78,9 @@ a, .btn-link {
 .cursor-pointer {
     cursor: pointer;
 }
+
+.icon-xl-x2 {
+    height: 7rem;
+    line-height: 7rem;
+    width: 7rem;
+}

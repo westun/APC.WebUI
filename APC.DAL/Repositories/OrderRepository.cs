@@ -24,6 +24,18 @@ namespace APC.DAL.Repositories
                 .FirstOrDefault(o => o.Id == orderId);
         }
 
+        public async Task<IEnumerable<Order>> GetAllAsync(int accountId)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            return dbContext.Order
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                        .ThenInclude(p => p.Type)
+                .Where(o => o.AccountId == accountId)
+                .ToList();
+        }
+
         public async Task<Order> SaveAsync(Order order)
         {
             if (order is null)

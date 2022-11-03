@@ -1,0 +1,114 @@
+﻿@page "/orders"
+@inject IOrderService orderService
+@inject NavigationManager navigationManager
+@inject ICartProductService cartProductService
+@inject ICartService cartService
+
+<div class="container">
+    <h3 class="mb-5">Your Orders</h3>
+    
+    @foreach (var order in this.AllOrders)
+    {
+        <div class="row mb-5">
+            <div class="col-lg-8 col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="clearfix">
+                            <div class="float-sm-start">
+                                <span class="fw-light">Order Date</span>:
+                                @order.Created.DateTime.ToString("MMMM d, yyyy")
+                            </div>
+                            <div class="float-sm-end text-sm-end">
+                                <button 
+                                    @onclick="() => this.OrderAgain(order)" 
+                                    disabled="@this.OrderAgainInProgress"
+                                    class="btn btn-primary">
+                                    Order Again
+                                    @if (this.OrderAgainInProgress && order.Id == OrderAgainOrderId)
+                                    {
+                                        <span class="spinner-border"></span>
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @{var i = 0;}
+                        @foreach (var orderItem in order.OrderItems)
+                        {
+                            var isNotLastRow = i < order.OrderItems.Count() - 1;
+                            <div class="row @(isNotLastRow ? "border-bottom" : "") mb-3">
+                                <div class="col-sm-12">
+                                    <div class="clearfix">
+                                        <div class="float-sm-start">
+                                            <img src="@orderItem.Product.ImageUrl" class="rounded-circle icon-shape icon-xl-x2" />
+                                        </div>
+                                        <div class="float-sm-start ms-3 mb-3">
+                                            <div class="fs-4">@orderItem.Product.Name</div>
+                                            <div>
+                                                @orderItem.Product.Type.Name
+                                            </div>
+                                            <div>
+                                                <span class="fw-light">Quantity:</span> @orderItem.Quantity
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (i == 0)
+                                {
+                                    @*<div class="col-sm-4">
+                                        <button class="btn btn-primary">Order Again</button>
+                                    </div>*@
+                                }
+                            </div>
+
+                            i++;
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    public CascadingAppState AppState { get; set; }
+
+    private IEnumerable<OrderDTO> AllOrders { get; set; }
+
+    private bool OrderAgainInProgress { get; set; }
+    private int OrderAgainOrderId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.AllOrders
+            = (await this.orderService.GetOrdersAsync(this.AppState.CurrentAccountId))
+            .OrderByDescending(o => o.Created);
+    }
+
+    private async Task OrderAgain(OrderDTO order)
+    {
+        this.OrderAgainOrderId = order.Id;
+        this.OrderAgainInProgress = true;
+        await Task.Delay(1);
+
+        var cart = await this.cartService.GetCartAsync(this.AppState.CurrentAccountId);
+        foreach (var orderItem in order.OrderItems)
+        {
+            await this.cartProductService.AddAsync(new CartProductDTO
+            {
+                CartId = cart.Id,
+                ProductId = orderItem.ProductId,
+                ProductQuantity = orderItem.Quantity,
+            });
+
+            this.AppState.CartItemCount += orderItem.Quantity;
+        }
+
+        this.navigationManager.NavigateTo("cart");
+
+        this.OrderAgainOrderId = 0;
+        this.OrderAgainInProgress = false;
+    }
+}
