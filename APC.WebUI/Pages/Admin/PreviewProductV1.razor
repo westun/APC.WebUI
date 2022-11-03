@@ -1,5 +1,5 @@
 ﻿@attribute [Authorize(Roles = "admin")]
-@page "/admin/product/preview/{id:int}";
+@page "/admin/product/previewV1/{id:int}";
 @inject IProductService productService
 
 @if (Product is null)

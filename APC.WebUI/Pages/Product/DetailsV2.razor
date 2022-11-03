@@ -4,7 +4,6 @@
 @inject ICompatibleProductsService compatibleProductsService
 @inject ICartProductService cartProductService
 @inject ICartService cartService
-@inject IAccountService accountService
 @inject IToastService toastService
 
 @if (this.product is null)
@@ -126,9 +125,6 @@ else
 @code {
     [Parameter]
     public int ProductId { get; set; }
-
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     [CascadingParameter]
     private CascadingAppState AppState { get; set; }
