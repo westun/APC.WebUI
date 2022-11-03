@@ -1,0 +1,38 @@
+﻿@attribute [Authorize(Roles = "admin")]
+@page "/admin/product/preview/{id:int}";
+@inject IProductService productService
+
+@if (Product is null)
+{
+    <Spinner/>
+}
+else
+{
+    <h2>@Product.DisplayName</h2>
+    <div class="well p-3 mb-2 clearfix">
+        <div class="float-start">
+            <img src="@Product.ImageUrl">
+        </div>
+        <div class="float-start ms-3">
+            <h2>@Product.Name</h2>
+            <ProductAttributeDisplay ProductAttributeValues="Product.ProductAttributesValues"></ProductAttributeDisplay>
+            <button href="#" class="btn btn-primary btn-lg">Add to Cart</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public ProductDTO Product { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            this.Product = await this.productService.GetProductByIdAsync(this.Id);
+        }
+
+        this.StateHasChanged();
+    }
+}
