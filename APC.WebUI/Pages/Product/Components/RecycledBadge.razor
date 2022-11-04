@@ -1,0 +1,15 @@
+﻿<div class="badge text-bg-success px-5 py-1">
+    @if (Product.Recycled)
+    {
+        @:Recycled
+    }
+    else if (Product.Category.Name != "Dispensers")
+    {
+        @:Virgin
+    }
+</div>
+
+@code {
+    [Parameter]
+    public ProductDTO Product { get; set; }
+}
