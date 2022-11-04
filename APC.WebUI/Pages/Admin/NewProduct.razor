@@ -278,7 +278,7 @@
             this.CustomErrorMessage += "<li>Type is required. </li>";
         }
 
-        if (!this.Product.CompanyId.HasValue || this.Product.CompanyId <= 0)
+        if (this.Product.CompanyId <= 0)
         {
             isValid = false;
             this.CustomErrorMessage += "<li>Company is required. </li>";
