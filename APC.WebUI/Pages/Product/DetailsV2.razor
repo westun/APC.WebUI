@@ -7,7 +7,7 @@
 @inject IToastService toastService
 @inject IJSRuntime jsRuntime 
 
-@if (this.product is null)
+@if (this.Product is null)
 {
     <Spinner/>    
 }
@@ -20,15 +20,15 @@ else
                 @*class="zoom"*@ @*onmousemove="zoom(event)"*@
                 @*style="background-image: url(@product.ImageUrl)"*@
                 <div>
-                    <img style="width: 100%; height: auto;" src="@product.ImageUrl">
+                    <img style="width: 100%; height: auto;" src="@Product.ImageUrl">
                 </div>
             </div>
         </div>
         <div class="col-md-6 mt-3">
             <div class="ps-lg-10 mt-6 mt-md-0">
-                <h1 class="mb-3">@product.Name</h1>
+                <h1 class="mb-3">@Product.Name</h1>
                 <div class="mb-4">
-                    <RecycledBadge Product="this.product"/>
+                    <RecycledBadge Product="this.Product" />
                 </div>
                 
                 <div class="fs-4 mb-3">
@@ -47,10 +47,10 @@ else
                         <input @onclick="IncreaseQuantity" type="button" value="+" class="button-plus btn btn-sm " data-field="quantity">
                     </div>
                 </div>
-                @if (this.cartProductDTO is not null)
+                @if (this.CartProductDTO is not null)
                 {
                     <div class="my-3">
-                        <span class="text-bg-light-warning text-muted p-2">You currently have <strong>@cartProductDTO.ProductQuantity</strong> of these items in your cart.</span>
+                        <span class="text-bg-light-warning text-muted p-2">You currently have <strong>@CartProductDTO.ProductQuantity</strong> of these items in your cart.</span>
                     </div>
                 }
                 <div class="mt-3 row justify-content-start g-2 align-items-center">
@@ -74,7 +74,7 @@ else
                 <div>
                     <table class="table table-borderless">
                         <tbody>
-                            @foreach (var pav in product.ProductAttributesValues)
+                            @foreach (var pav in Product.ProductAttributesValues)
                             {
                                 <tr>
                                     <td class="w-5 ">@pav.ProductAttribute.Name:</td>
@@ -84,10 +84,10 @@ else
                         </tbody>
                     </table>
                 </div>
-                @if (this.product.BrochureUrl is not null)
+                @if (this.Product.BrochureUrl is not null)
                 {
                     <div class="mt-3 mb-2">
-                        <a href="@this.product.BrochureUrl" target="_blank">
+                        <a href="@this.Product.BrochureUrl" target="_blank">
                             <span class="bi bi-download"></span>
                             Download Our Brochure
                         </a>
@@ -96,7 +96,7 @@ else
                 <hr class="my-6"/>
                 <div>
                     <h3>Areas of Application</h3>
-                    @foreach (var aoa in this.product.AreasOfApplications)
+                    @foreach (var aoa in this.Product.AreasOfApplications)
                     {
                         <span class="badge text-bg-light-warning me-3 mb-3 py-2 px-5">@aoa.Name</span>
                     }
@@ -106,10 +106,10 @@ else
     </div>
     
     <div class="mb-5 mt-3">
-        <CompatibleProductDetail CompatibleProductsDTO="this.compatibleProductsDTO" />
+        <CompatibleProductDetail CompatibleProductsDTO="this.CompatibleProductsDTO" />
     </div>
 
-    <SimilarProductDetail SimilarProductsDTO="this.similarProductsDTOs"/>
+    <SimilarProductDetail SimilarProductsDTO="this.SimilarProductsDTOs"/>
 
     <div class="mb-5"></div>
 }
@@ -121,11 +121,11 @@ else
     [CascadingParameter]
     private CascadingAppState AppState { get; set; }
 
-    private ProductDTO product { get; set; }
-    private IEnumerable<SimilarProductsDTO> similarProductsDTOs { get; set; }
-    private IEnumerable<CompatibleProductsDTO> compatibleProductsDTO { get; set; }
-    private CartDTO cartDTO { get; set; }
-    private CartProductDTO cartProductDTO { get; set; }
+    private ProductDTO Product { get; set; }
+    private IEnumerable<SimilarProductsDTO> SimilarProductsDTOs { get; set; }
+    private IEnumerable<CompatibleProductsDTO> CompatibleProductsDTO { get; set; }
+    private CartDTO CartDTO { get; set; }
+    private CartProductDTO CartProductDTO { get; set; }
 
     private int SelectedQuantity { get; set; } = 1;
 
@@ -133,17 +133,17 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        this.product = await this.productService.GetProductByIdAsync(this.ProductId);
+        this.Product = await this.productService.GetProductByIdAsync(this.ProductId);
 
-        this.similarProductsDTOs =
+        this.SimilarProductsDTOs =
             await this.similarProductsService.GetSimilarProductsByProductIdAsync(this.ProductId);
 
-        this.compatibleProductsDTO =
+        this.CompatibleProductsDTO =
             await this.compatibleProductsService.GetCompatibleProductsByProductIdAsync(this.ProductId);
 
-        this.cartDTO = await this.cartService.GetCartAsync(this.AppState.CurrentAccountId);
+        this.CartDTO = await this.cartService.GetCartAsync(this.AppState.CurrentAccountId);
 
-        this.cartProductDTO = this.cartDTO.CartProducts
+        this.CartProductDTO = this.CartDTO.CartProducts
             .FirstOrDefault(cp => cp.ProductId == this.ProductId);
     }
 
@@ -171,24 +171,24 @@ else
 
         await this.cartProductService.AddAsync(new CartProductDTO
         {
-            CartId = this.cartDTO.Id,
+            CartId = this.CartDTO.Id,
             ProductId = this.ProductId,
             ProductQuantity = this.SelectedQuantity,
         });
 
         this.toastService.ShowSuccess(
-            message: $"Item '{this.product.Name}' has been added to your shopping cart.",
+            message: $"Item '{this.Product.Name}' has been added to your shopping cart.",
             heading: "Success");
 
-        if (this.cartProductDTO is null)
+        if (this.CartProductDTO is null)
         {
-            this.cartDTO = await this.cartService.GetCartAsync(this.AppState.CurrentAccountId);
-            this.cartProductDTO = this.cartDTO.CartProducts
+            this.CartDTO = await this.cartService.GetCartAsync(this.AppState.CurrentAccountId);
+            this.CartProductDTO = this.CartDTO.CartProducts
                 .FirstOrDefault(cp => cp.ProductId == this.ProductId);
         }
         else
         {
-            this.cartProductDTO.ProductQuantity += this.SelectedQuantity;
+            this.CartProductDTO.ProductQuantity += this.SelectedQuantity;
         }
 
         this.AppState.CartItemCount += this.SelectedQuantity;
