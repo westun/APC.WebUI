@@ -1,0 +1,85 @@
+﻿@attribute [Authorize(Roles = "admin")]
+@page "/admin/company"
+@inject ICompanyService companyService
+@inject IToastService toastService
+
+@if (this.CompanyDTOs is null)
+{
+    <Spinner></Spinner>
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-6 mb-3">
+            <h2>Add a New Company</h2>
+            <EditForm Model="CompanyDTO" OnValidSubmit="OnNewAreasOfApplicationSubmit">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+                <div>
+                    <label class="form-label">Name</label>
+                    <div class="col-lg-6 col-md-10 col-sm-12">
+                        <InputText @bind-Value="CompanyDTO.Name" class="form-control"></InputText>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Save</button>
+                @if (this.SaveInProgress)
+                {
+                    <span class="spinner-border text-success align-middle"></span>
+                }
+            </EditForm>
+        </div>
+
+        <div class="col-sm-6">
+            <h2>Areas of Application</h2>
+            <div>
+                @foreach (var company in CompanyDTOs)
+                {
+                    <p>
+                        <span class="oi oi-circle-check text-success"></span>
+                        @company.Name
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private IEnumerable<CompanyDTO> CompanyDTOs { get; set; }
+    private CompanyDTO CompanyDTO { get; set; } = new();
+
+    private bool SaveInProgress { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            this.CompanyDTOs = await this.companyService.GetCompaniesAsync();
+
+            this.StateHasChanged();
+        }
+    }
+
+    private async Task OnNewAreasOfApplicationSubmit(EditContext editContext)
+    {
+        this.SaveInProgress = true;
+
+        var company = await this.companyService.SaveCompany(this.CompanyDTO);
+
+        this.CompanyDTOs = await this.companyService.GetCompaniesAsync();
+
+        this.toastService.ShowSuccess(
+            message: $"Company '{company.Name}' has been Saved Successfully.",
+            heading: "Success");
+
+        this.ClearForm();
+
+        this.SaveInProgress = false;
+    }
+
+    private void ClearForm()
+    {
+        this.CompanyDTO = new();
+    }
+    
+}
