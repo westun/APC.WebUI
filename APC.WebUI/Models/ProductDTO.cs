@@ -7,6 +7,7 @@ namespace APC.WebUI.Models
         public int Id { get; set; }
         public int CategoryId { get; set; }
         public int TypeId { get; set; }
+        public int? CompanyId { get; set; }
 
         [Required(ErrorMessage = "Product Name is required.")]
         public string Name { get; set; }

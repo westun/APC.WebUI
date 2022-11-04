@@ -20,6 +20,7 @@ namespace APC.WebUI.Configuration
             services.AddTransient<ICartService, CartService>();
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IOrderService, OrderService>();
+            services.AddTransient<ICompanyService, CompanyService>();
             
             return services;
         }

@@ -8,6 +8,8 @@
 @inject IProductTypeService productTypeService
 @inject IFileUploadService fileUploadService
 @inject IBrochureUploadService brochureUploadService
+@inject ICompanyService companyService
+@inject IToastService toastService
 
 <div class="container">
     <div class="row">
@@ -72,6 +74,16 @@
                     @foreach (var type in ProductTypes)
                     {
                         <option value="@type.Id">@type.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label for="type" class="form-label">Company</label>
+                <InputSelect @bind-Value="Product.CompanyId" id="company" class="form-select">
+                    <option></option>
+                    @foreach (var company in Companies)
+                    {
+                        <option value="@company.Id">@company.Name</option>
                     }
                 </InputSelect>
             </div>
@@ -149,6 +161,7 @@
 
     private IEnumerable<ProductCategoryDTO> ProductCategories { get; set; } = new List<ProductCategoryDTO>();
     private IEnumerable<ProductTypeDTO> ProductTypes { get; set; } = new List<ProductTypeDTO>();
+    private IEnumerable<CompanyDTO> Companies { get; set; } = new List<CompanyDTO>();
 
     private string CustomErrorMessage { get; set; }
     private string BrochureErrorMessage { get; set; }
@@ -156,7 +169,7 @@
     private bool ShowSuccessAlert { get; set; }
     private bool SaveInProgress { get; set; }
     private bool AllowPhotoUpload { get; set; } = true;
-    
+
     private bool IsEditing => this.ProductId > 0;
 
     private string RecycledLabelText { get; set; }
@@ -176,6 +189,8 @@
         }
 
         this.ProductCategories = await this.productCategoryService.GetProductCategoriesAsync();
+
+        this.Companies = await this.companyService.GetCompaniesAsync();
 
         this.RecycledLabelText = this.Product.Recycled
             ? this.RecycledLabelIsChecked
@@ -230,6 +245,10 @@
         this.ShowSuccessAlert = true;
 
         this.ClearForm();
+
+        this.toastService.ShowSuccess(
+            message: $"The Product '{this.CreatedProduct.Name}' has been Saved Successfully.",
+            heading: "Success");
     }
 
     private string GetUniqueFileName(string originalFileName)
@@ -246,15 +265,11 @@
     private bool IsFormValid()
     {
         //form doesn't recognize these fields are required, unless you select a value, then unselect
-        bool isValid;
+        bool isValid = true;
         if (this.Product.CategoryId <= 0)
         {
             isValid = false;
             this.CustomErrorMessage += "<li>Category is required. </li>";
-        }
-        else
-        {
-            isValid = true;
         }
 
         if (this.Product.TypeId <= 0)
@@ -262,19 +277,17 @@
             isValid = false;
             this.CustomErrorMessage += "<li>Type is required. </li>";
         }
-        else
+
+        if (!this.Product.CompanyId.HasValue || this.Product.CompanyId <= 0)
         {
-            isValid = true;
+            isValid = false;
+            this.CustomErrorMessage += "<li>Company is required. </li>";
         }
 
-    @if (this.SelectedFile is null && this.AllowPhotoUpload)
+        @if (this.SelectedFile is null && this.AllowPhotoUpload)
         {
             isValid = false;
             this.CustomErrorMessage += "<li>Photo Upload is required. </li>";
-        }
-        else
-        {
-            isValid = true;
         }
 
         @if (this.SelectedBrochureFile is not null 
@@ -282,10 +295,6 @@
         {
             isValid = false;
             this.BrochureErrorMessage += "<li>The Brochure must be in PDF format.</li>";
-        }
-        else
-        {
-            isValid = true;
         }
 
         return isValid;

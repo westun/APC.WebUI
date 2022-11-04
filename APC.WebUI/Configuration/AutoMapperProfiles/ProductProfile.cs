@@ -46,6 +46,9 @@ namespace APC.WebUI.Configuration.AutoMapperProfiles
 
             this.CreateMap<OrderItem, OrderItemDTO>()
                 .ReverseMap();
+
+            this.CreateMap<Company, CompanyDTO>()
+                .ReverseMap();
         }
     }
 }
