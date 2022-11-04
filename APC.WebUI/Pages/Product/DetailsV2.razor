@@ -5,6 +5,7 @@
 @inject ICartProductService cartProductService
 @inject ICartService cartService
 @inject IToastService toastService
+@inject IJSRuntime jsRuntime 
 
 @if (this.product is null)
 {
@@ -153,6 +154,14 @@ else
 
         this.cartProductDTO = this.cartDTO.CartProducts
             .FirstOrDefault(cp => cp.ProductId == this.ProductId);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("window.apc.scollPageToTop");
+        }
     }
 
     private async Task AddToCart()
