@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string Name { get; set; }
 
-        IEnumerable<Product> Products { get; set; }
+        public ICollection<Product> Products { get; set; }
+        public ICollection<Account> Accounts { get; set; }
     }
 }

@@ -11,6 +11,6 @@
         public ICollection<Cart> Carts { get; set; } = new List<Cart>();
         public ICollection<Role> Roles { get; set; }
         public ICollection<Order> Orders { get; set; }
-
+        public ICollection<Company> Companies { get; set; }
     }
 }

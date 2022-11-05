@@ -75,6 +75,14 @@ namespace APC.DAL.DataAccess
                     .WithOne(cp => cp.Product);
             });
 
+            modelBuilder.Entity<Company>(eb =>
+            {
+                eb.HasMany(c => c.Accounts)
+                    .WithMany(a => a.Companies);
+
+                eb.HasMany(c => c.Products)
+                    .WithOne(p => p.Company);
+            });
         }
     }
 }

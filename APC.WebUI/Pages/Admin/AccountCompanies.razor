@@ -1,0 +1,134 @@
+﻿@page "/admin/account/company"
+@inject IAccountService accountService
+@inject ICompanyService companyService
+@inject IToastService toastService
+
+@if (this.Accounts is null)
+{
+    <Spinner/>
+}
+else
+{
+    <h3>Account Companies</h3>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <EditForm Model="this.Accounts" OnValidSubmit="SelectAccount">
+                <label class="form-label">Select an Account:</label>
+                <InputSelect 
+                    Value="this.SelectedAccountId"
+                    ValueExpression="() => this.SelectedAccountId"
+                    ValueChanged="((int args) => { this.SelectedAccountId = args; SelectedAccountChanged(); })"
+                    class="form-select">
+                    <option></option>
+                    @foreach (var account in this.Accounts)
+                    {
+                        <option value="@account.Id">
+                            @account.DisplayName | @account.Email
+                        </option>
+                    }
+                </InputSelect>
+                <button type="submit" class="btn btn-primary mt-2">Select</button>
+            </EditForm>
+
+            @if (this.Companies is not null)
+            {
+                <div class="mt-5">
+                    <h4>Select Companies the account will see products from</h4>
+                    <EditForm Model="this" OnValidSubmit="SaveCompaniesToAccount">
+                        @foreach (var company in this.Companies)
+                        {
+                            <div class="form-check form-switch">
+                                <InputCheckbox @bind-Value="@company.IsChecked"
+                                       id="@company.Id"
+                                       class="form-check-input" />
+                                <label class="form-check-label" for="@company.Id">
+                                    @company.Name
+                                </label>
+                            </div>
+                        }
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary me-3">Save</button>
+                            @if (this.SaveInProgress)
+                            {
+                                <span class="spinner-border text-success align-middle"></span>
+                            }
+                            <a href="admin/product/list" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </EditForm>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+
+
+@code {
+    public IEnumerable<AccountDTO> Accounts { get; set; }
+    public CompanyVM[] Companies { get; set; }
+
+    public AccountDTO SelectedAccount { get; set; } = new();
+    public int SelectedAccountId { get; set; }
+
+    public bool SaveInProgress { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.Accounts = await this.accountService.GetAccountsAsync();
+    }
+
+    private async Task SelectAccount(EditContext editContext)
+    {
+        var accounts = await this.accountService.GetAccountsAsync();
+        this.SelectedAccount = accounts.FirstOrDefault(a => a.Id == this.SelectedAccountId);
+        var selectedCompaniesIds = this.SelectedAccount.Companies.Select(c => c.Id);
+
+        var companies = await this.companyService.GetCompaniesAsync();
+
+        this.Companies = companies.Select(c => new CompanyVM
+        {
+            Id = c.Id,
+            Name = c.Name,
+            IsChecked = selectedCompaniesIds.Contains(c.Id),
+        }).ToArray();
+    }
+
+    private void SelectedAccountChanged()
+    {
+        this.Companies = null;
+    }
+
+    private async Task SaveCompaniesToAccount(EditContext editContext)
+    {
+        this.SaveInProgress = true;
+        Task.Delay(1);
+
+        var companiesToUpdate = this.Companies
+            .Where(c => c.IsChecked)
+            .Select(c => new CompanyDTO 
+            { 
+                Id = c.Id,
+                Name = c.Name,
+            });
+
+        await this.accountService.SaveCompaniesToAccountAsync(this.SelectedAccountId, companiesToUpdate);
+
+        this.ClearForm();
+
+        this.toastService.ShowSuccess(
+            message: $"Companies have been updated for the selected account Successfully.",
+            heading: "Success");
+
+        this.SaveInProgress = false;
+    }
+
+    private void ClearForm()
+    {
+        this.SelectedAccount = new();
+        this.SelectedAccountId = 0;
+        this.Companies = null;
+        StateHasChanged();
+    }
+}

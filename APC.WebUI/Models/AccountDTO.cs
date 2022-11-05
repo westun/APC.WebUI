@@ -8,5 +8,6 @@
         public string? DisplayName { get; set; }
         public string Email { get; set; }
         public string? ObjectIdentifier { get; set; }
+        public IEnumerable<CompanyDTO> Companies { get; set; }
     }
 }
