@@ -1,6 +1,5 @@
 ﻿@attribute [Authorize(Roles = "admin")]
 @page "/admin/product/{productId:int}/preview"
-@using APC.WebUI.Pages.Admin.Components;
 @inject IProductService productService
 @inject ISimilarProductsService similarProductsService
 @inject ICompatibleProductsService compatibleProductsService

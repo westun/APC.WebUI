@@ -1,6 +1,5 @@
 ﻿@attribute [Authorize(Roles = "admin")]
 @page "/admin/product/list"
-@using APC.WebUI.Pages.Admin.Components;
 @inject IProductService productService
 
 @if (Products is null)
