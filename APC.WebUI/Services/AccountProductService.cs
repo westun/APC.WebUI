@@ -25,25 +25,25 @@ namespace APC.WebUI.Services
             return this.mapper.Map<IEnumerable<AccountProductDTO>>(accountProducts);
         }
 
-        public async Task AddAccountProduct(AccountProductDTO accountProductDTO)
+        public async Task AddAccountProductAsync(AccountProductDTO accountProductDTO)
         {
             var accountProduct = this.mapper.Map<AccountProduct>(accountProductDTO);
 
-            await this.accountProductRepository.Add(accountProduct);
+            await this.accountProductRepository.AddAsync(accountProduct);
         }
 
-        public async Task UpdateAccountProduct(AccountProductDTO accountProductDTO)
+        public async Task UpdateAccountProductAsync(AccountProductDTO accountProductDTO)
         {
             var accountProduct = this.mapper.Map<AccountProduct>(accountProductDTO);
 
-            await this.accountProductRepository.Update(accountProduct);
+            await this.accountProductRepository.UpdateAsync(accountProduct);
         }
 
-        public async Task RemoveAccountProduct(AccountProductDTO accountProductDTO)
+        public async Task RemoveAccountProductAsync(AccountProductDTO accountProductDTO)
         {
             var accountProduct = this.mapper.Map<AccountProduct>(accountProductDTO);
 
-            await this.accountProductRepository.Remove(accountProduct);
+            await this.accountProductRepository.RemoveAsync(accountProduct);
         }
     }
 }

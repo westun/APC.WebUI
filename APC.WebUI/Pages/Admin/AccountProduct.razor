@@ -140,7 +140,7 @@ else
             ProductId = this.SelectedProductId,
             Cost = cost,
         };
-        await this.accountProductService.AddAccountProduct(accountProduct);
+        await this.accountProductService.AddAccountProductAsync(accountProduct);
 
         accountProduct.Product = selectedProduct;
 
@@ -194,7 +194,7 @@ else
             return;
         }
 
-        await this.accountProductService.RemoveAccountProduct(new AccountProductDTO
+        await this.accountProductService.RemoveAccountProductAsync(new AccountProductDTO
         {
             AccountId = accountProductDTO.AccountId,
             ProductId = accountProductDTO.ProductId,
@@ -211,7 +211,7 @@ else
 
     private async Task EditAccountProduct(AccountProductDTO accountProductDTO)
     {
-        await this.accountProductService.UpdateAccountProduct(new AccountProductDTO
+        await this.accountProductService.UpdateAccountProductAsync(new AccountProductDTO
         {
             AccountId = accountProductDTO.AccountId,
             ProductId = accountProductDTO.ProductId,

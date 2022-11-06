@@ -23,7 +23,7 @@ namespace APC.DAL.Repositories
                 .ToList();
         }
 
-        public async Task Add(AccountProduct accountProduct)
+        public async Task AddAsync(AccountProduct accountProduct)
         {
             if (accountProduct is null)
             {
@@ -36,7 +36,7 @@ namespace APC.DAL.Repositories
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task Update(AccountProduct accountProduct)
+        public async Task UpdateAsync(AccountProduct accountProduct)
         {
             if (accountProduct is null)
             {
@@ -50,7 +50,7 @@ namespace APC.DAL.Repositories
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task Remove(AccountProduct accountProduct)
+        public async Task RemoveAsync(AccountProduct accountProduct)
         {
             if (accountProduct is null)
             {

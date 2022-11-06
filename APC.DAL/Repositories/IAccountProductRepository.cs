@@ -5,8 +5,8 @@ namespace APC.DAL.Repositories
     public interface IAccountProductRepository
     {
         Task<IEnumerable<AccountProduct>> GetAsync(int accountId);
-        Task Add(AccountProduct accountProduct);
-        Task Update(AccountProduct accountProduct);
-        Task Remove(AccountProduct accountProduct);
+        Task AddAsync(AccountProduct accountProduct);
+        Task UpdateAsync(AccountProduct accountProduct);
+        Task RemoveAsync(AccountProduct accountProduct);
     }
 }
