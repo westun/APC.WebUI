@@ -40,6 +40,7 @@ namespace APC.DAL.DataAccess
         public DbSet<Order> Order { get; set; }
         public DbSet<OrderItem> OrderItem { get; set; }
         public DbSet<Company> Company { get; set; }
+        public DbSet<AccountProduct> AccountProduct { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -82,6 +83,17 @@ namespace APC.DAL.DataAccess
 
                 eb.HasMany(c => c.Products)
                     .WithOne(p => p.Company);
+            });
+
+            modelBuilder.Entity<AccountProduct>(eb =>
+            {
+                eb.HasKey(ap => new { ap.AccountId, ap.ProductId });
+
+                eb.HasOne(ap => ap.Account)
+                    .WithMany(a => a.AccountProduct);
+
+                eb.HasOne(ap => ap.Product)
+                    .WithMany(p => p.AccountProduct);
             });
         }
     }

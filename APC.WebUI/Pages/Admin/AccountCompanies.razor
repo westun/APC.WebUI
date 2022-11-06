@@ -66,13 +66,13 @@ else
 
 
 @code {
-    public IEnumerable<AccountDTO> Accounts { get; set; }
-    public CompanyVM[] Companies { get; set; }
+    private IEnumerable<AccountDTO> Accounts { get; set; }
+    private CompanyVM[] Companies { get; set; }
 
-    public AccountDTO SelectedAccount { get; set; } = new();
-    public int SelectedAccountId { get; set; }
+    private AccountDTO SelectedAccount { get; set; } = new();
+    private int SelectedAccountId { get; set; }
 
-    public bool SaveInProgress { get; set; }
+    private bool SaveInProgress { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,6 +81,7 @@ else
 
     private async Task SelectAccount(EditContext editContext)
     {
+        //getting accounts from db here again to display updated company list
         var accounts = await this.accountService.GetAccountsAsync();
         this.SelectedAccount = accounts.FirstOrDefault(a => a.Id == this.SelectedAccountId);
         var selectedCompaniesIds = this.SelectedAccount.Companies.Select(c => c.Id);
@@ -103,7 +104,7 @@ else
     private async Task SaveCompaniesToAccount(EditContext editContext)
     {
         this.SaveInProgress = true;
-        Task.Delay(1);
+        await Task.Delay(1);
 
         var companiesToUpdate = this.Companies
             .Where(c => c.IsChecked)

@@ -1,0 +1,179 @@
+﻿@page "/admin/account/product"
+@inject IProductService productService
+@inject IAccountService accountService
+@inject IAccountProductService accountProductService
+@inject IToastService toastService
+
+@if (this.Accounts is null)
+{
+    <Spinner/>
+}
+else
+{
+    <h3>Account Product</h3>
+    <div class="row">
+        <div class="col-sm-6">
+            <EditForm Model="this.Accounts" OnValidSubmit="SelectAccount">
+                <label class="form-label">Select an Account:</label>
+                <InputSelect Value="this.SelectedAccountId"
+                         ValueExpression="() => this.SelectedAccountId"
+                         ValueChanged="((int args) => { this.SelectedAccountId = args; SelectedAccountChanged(); })"
+                         class="form-select">
+                    <option></option>
+                    @foreach (var account in this.Accounts)
+                    {
+                        <option value="@account.Id">
+                            @account.DisplayName | @account.Email
+                        </option>
+                    }
+                </InputSelect>
+                <button type="submit" class="btn btn-primary mt-2">Select</button>
+            </EditForm>
+
+            @if (this.Products is not null)
+            {
+                <div class="mt-5">
+                    <EditForm Model="this" OnSubmit="SelectProduct">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+                        @*Custom error message for select controls that don't validate properly*@
+                        <ul class="validation-message">@((MarkupString)CustomErrorMessage)</ul>
+                        <div>
+                            <label class="form-label">Select a product the account will see</label>
+                            <InputSelect @bind-Value="this.SelectedProductId" class="form-select">
+                                <option></option>
+                                @foreach (var product in this.Products)
+                                {
+                                    <option value="@product.Id">@product.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="mt-3">
+                            <label class="form-label">Enter the cost the account will pay for the product</label>
+                            <InputText @bind-Value="this.Cost" class="form-control"></InputText>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3 me-3" disabled="@this.SaveInProgres">
+                            @(this.SaveInProgres ? "Processing..." : "Save")
+                        </button>
+                        @if (this.SaveInProgres)
+                        {
+                            <span class="spinner-border text-success align-middle"></span>
+                        }
+                    </EditForm>
+                    @if (!this.AccountProducts.Any())
+                    {
+                        <h4 class="mt-5">There are no Products assigned for this account</h4>
+                    }
+                </div>
+            }
+        </div>
+        <div class="col-sm-6">
+            @if (this.Products is not null)
+            {
+                <CustomerProductList AccountProducts="this.AccountProducts"/>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private List<ProductDTO> Products { get; set; }
+    private AccountDTO[] Accounts { get; set; }
+    private List<AccountProductDTO> AccountProducts { get; set; }
+
+    private AccountDTO SelectedAccount { get; set; } = new();
+    private int SelectedAccountId { get; set; }
+    private int SelectedProductId { get; set; }
+    private string Cost { get; set; }
+
+    private string CustomErrorMessage { get; set; }
+    private bool SaveInProgres { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.Accounts = (await this.accountService.GetAccountsAsync()).ToArray();
+    }
+
+    private async Task SelectAccount(EditContext editContext)
+    {
+        this.AccountProducts = 
+            (await this.accountProductService.GetAccountProductsAsync(this.SelectedAccountId)).ToList();
+
+        var accountProductIds = this.AccountProducts.Select(ap => ap.ProductId);
+
+        this.Products = (await this.productService.GetAllProductsAsync())
+            .Where(p => !accountProductIds.Contains(p.Id))
+            .ToList();
+    }
+
+    private void SelectedAccountChanged()
+    {
+        //when a new account is slected, hide everything allowing the admin user to start over
+        this.Products = null;
+        this.AccountProducts = null;
+    }
+
+    private async Task SelectProduct(EditContext editContext)
+    {
+        if (!IsFormValid())
+        {
+            return;
+        }
+
+        this.SaveInProgres = true;
+        await Task.Delay(1);
+
+        var selectedProduct =
+            this.Products.FirstOrDefault(p => p.Id == this.SelectedProductId);
+
+        decimal cost;
+        decimal.TryParse(this.Cost, out cost);
+        var accountProduct = new AccountProductDTO
+        {
+            AccountId = this.SelectedAccountId,
+            ProductId = this.SelectedProductId,
+            Cost = cost,
+        };
+        await this.accountProductService.AddAccountProduct(accountProduct);
+
+        accountProduct.Product = selectedProduct;
+
+        this.AccountProducts.Add(accountProduct);
+
+        this.toastService.ShowSuccess(
+            message: $"Product '{selectedProduct.Name}' has been added for the selected account Successfully.",
+            heading: "Success");
+
+        this.Products.Remove(selectedProduct);
+        this.SelectedProductId = 0;
+        this.Cost = null;
+
+        this.SaveInProgres = false;
+    }
+
+    private bool IsFormValid()
+    {
+        this.CustomErrorMessage = null;
+        bool isValid = true;
+        if (this.SelectedProductId <= 0)
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Product is required. </li>";
+        }
+
+        if (string.IsNullOrWhiteSpace(this.Cost))
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Cost is required. </li>";
+        }
+
+        decimal cost;
+        if (!decimal.TryParse(this.Cost, out cost))
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Cost must be a number. </li>";
+        }
+
+        return isValid;
+    }
+}

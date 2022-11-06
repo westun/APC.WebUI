@@ -19,5 +19,6 @@
         public ICollection<ProductAttributeValue> ProductAttributesValues { get; set; } = new List<ProductAttributeValue>();
         public ICollection<AreasOfApplication> AreasOfApplications { get; set; } = new List<AreasOfApplication>();
         public ICollection<CartProduct> CartProducts { get; set; } = new List<CartProduct>();
+        public ICollection<AccountProduct> AccountProduct { get; set; } = new List<AccountProduct>();
     }
 }

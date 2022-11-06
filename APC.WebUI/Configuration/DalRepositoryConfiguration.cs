@@ -19,6 +19,7 @@ namespace APC.WebUI.Configuration
             services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IOrderRepository, OrderRepository>();
             services.AddTransient<ICompanyRepository, CompanyRepository>();
+            services.AddTransient<IAccountProductRepository, AccountProductRepository>();
 
             return services;
         }

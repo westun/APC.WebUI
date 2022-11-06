@@ -9,8 +9,9 @@
         public string Email { get; set; }
         public string? ObjectIdentifier { get; set; }
         public ICollection<Cart> Carts { get; set; } = new List<Cart>();
-        public ICollection<Role> Roles { get; set; }
-        public ICollection<Order> Orders { get; set; }
-        public ICollection<Company> Companies { get; set; }
+        public ICollection<Role> Roles { get; set; } = new List<Role>();
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<Company> Companies { get; set; } = new List<Company>();
+        public ICollection<AccountProduct> AccountProduct { get; set; } = new List<AccountProduct>();
     }
 }

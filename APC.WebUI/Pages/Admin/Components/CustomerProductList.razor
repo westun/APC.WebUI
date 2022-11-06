@@ -1,0 +1,27 @@
+﻿<div>
+    <h4>Customer Product List</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Product Name</th>
+                <th>Customer Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var accountProduct in this.AccountProducts)
+            {
+                <tr>
+                    <td><img src="@accountProduct.Product.ImageUrl" class="icon-xl" /></td>
+                    <td>@accountProduct.Product.Name</td>
+                    <td><span>$</span>@accountProduct.Cost</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<AccountProductDTO> AccountProducts { get; set; }
+}
