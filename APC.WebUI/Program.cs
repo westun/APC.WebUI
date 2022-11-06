@@ -1,6 +1,7 @@
 using APC.DAL.DataAccess;
 using APC.WebUI.Authentication.EventHandlers;
 using APC.WebUI.Configuration;
+using Blazored.Modal;
 using Blazored.Toast;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +70,7 @@ namespace APC.WebUI
             builder.Services.AddAutoMapper(typeof(Program));
 
             builder.Services.AddBlazoredToast();
+            builder.Services.AddBlazoredModal();
 
             builder.Services.AddDalRepositories();
             builder.Services.AddDalServices();

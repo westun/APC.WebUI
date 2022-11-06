@@ -32,7 +32,19 @@ namespace APC.DAL.Repositories
 
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
-            dbContext.Add(accountProduct);
+            dbContext.AccountProduct.Add(accountProduct);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task Remove(AccountProduct accountProduct)
+        {
+            if (accountProduct is null)
+            {
+                throw new ArgumentNullException(nameof(accountProduct));
+            }
+
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            dbContext.AccountProduct.Remove(accountProduct);
             await dbContext.SaveChangesAsync();
         }
     }

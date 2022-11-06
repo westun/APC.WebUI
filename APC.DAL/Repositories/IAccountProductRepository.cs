@@ -6,5 +6,6 @@ namespace APC.DAL.Repositories
     {
         Task<IEnumerable<AccountProduct>> GetAsync(int accountId);
         Task Add(AccountProduct accountProduct);
+        Task Remove(AccountProduct accountProduct);
     }
 }

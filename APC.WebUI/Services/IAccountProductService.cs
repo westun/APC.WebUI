@@ -6,5 +6,6 @@ namespace APC.WebUI.Services
     {
         Task<IEnumerable<AccountProductDTO>> GetAccountProductsAsync(int accountId);
         Task AddAccountProduct(AccountProductDTO accountProductDTO);
+        Task RemoveAccountProduct(AccountProductDTO accountProductDTO);
     }
 }

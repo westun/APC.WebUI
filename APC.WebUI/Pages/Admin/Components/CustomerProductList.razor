@@ -6,6 +6,8 @@
                 <th>&nbsp;</th>
                 <th>Product Name</th>
                 <th>Customer Cost</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
             </tr>
         </thead>
         <tbody>
@@ -15,6 +17,12 @@
                     <td><img src="@accountProduct.Product.ImageUrl" class="icon-xl" /></td>
                     <td>@accountProduct.Product.Name</td>
                     <td><span>$</span>@accountProduct.Cost</td>
+                    <td><button class="btn btn-primary">Edit</button></td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => RemoveAccountProduct(accountProduct)">
+                            Remove
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -24,4 +32,12 @@
 @code {
     [Parameter]
     public IEnumerable<AccountProductDTO> AccountProducts { get; set; }
+
+    [Parameter]
+    public EventCallback<AccountProductDTO> RemoveAccountProdutCallback { get; set; }
+
+    private async Task RemoveAccountProduct(AccountProductDTO accountProductDTO)
+    {
+        await this.RemoveAccountProdutCallback.InvokeAsync(accountProductDTO);
+    }
 }

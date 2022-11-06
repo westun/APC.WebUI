@@ -70,13 +70,18 @@ else
         <div class="col-sm-6">
             @if (this.Products is not null)
             {
-                <CustomerProductList AccountProducts="this.AccountProducts"/>
+                <CustomerProductList 
+                    AccountProducts="this.AccountProducts"
+                    RemoveAccountProdutCallback="RemoveAccountProdut"/>
             }
         </div>
     </div>
 }
 
 @code {
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+
     private List<ProductDTO> Products { get; set; }
     private AccountDTO[] Accounts { get; set; }
     private List<AccountProductDTO> AccountProducts { get; set; }
@@ -175,5 +180,31 @@ else
         }
 
         return isValid;
+    }
+
+    private async Task RemoveAccountProdut(AccountProductDTO accountProductDTO)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(ConfirmModal.Message), accountProductDTO.Product.Name);
+        var confirmModal = this.Modal.Show<ConfirmModal>("Remove Item", parameters);
+        var modalResult = await confirmModal.Result;
+        if (modalResult.Cancelled)
+        {
+            return;
+        }
+
+        await this.accountProductService.RemoveAccountProduct(new AccountProductDTO
+        {
+            AccountId = accountProductDTO.AccountId,
+            ProductId = accountProductDTO.ProductId,
+        });
+
+        var accountProduct = this.AccountProducts.FirstOrDefault(ap => ap.ProductId == accountProductDTO.ProductId
+            && ap.AccountId == accountProductDTO.AccountId);
+        this.AccountProducts.Remove(accountProduct);
+
+        this.toastService.ShowSuccess(
+            message: $"Product '{accountProductDTO.Product.Name}' has been removed from the selected account Successfully.",
+            heading: "Success");
     }
 }

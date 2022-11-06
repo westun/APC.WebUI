@@ -27,12 +27,16 @@ namespace APC.WebUI.Services
 
         public async Task AddAccountProduct(AccountProductDTO accountProductDTO)
         {
-            //temp testing
-            Thread.Sleep(5000);
-
             var accountProduct = this.mapper.Map<AccountProduct>(accountProductDTO);
 
             await this.accountProductRepository.Add(accountProduct);
+        }
+
+        public async Task RemoveAccountProduct(AccountProductDTO accountProductDTO)
+        {
+            var accountProduct = this.mapper.Map<AccountProduct>(accountProductDTO);
+
+            await this.accountProductRepository.Remove(accountProduct);
         }
     }
 }
