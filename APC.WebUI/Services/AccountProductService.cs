@@ -32,6 +32,13 @@ namespace APC.WebUI.Services
             await this.accountProductRepository.Add(accountProduct);
         }
 
+        public async Task UpdateAccountProduct(AccountProductDTO accountProductDTO)
+        {
+            var accountProduct = this.mapper.Map<AccountProduct>(accountProductDTO);
+
+            await this.accountProductRepository.Update(accountProduct);
+        }
+
         public async Task RemoveAccountProduct(AccountProductDTO accountProductDTO)
         {
             var accountProduct = this.mapper.Map<AccountProduct>(accountProductDTO);

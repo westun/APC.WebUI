@@ -12,7 +12,7 @@ else
 {
     <h3>Account Product</h3>
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-lg-4">
             <EditForm Model="this.Accounts" OnValidSubmit="SelectAccount">
                 <label class="form-label">Select an Account:</label>
                 <InputSelect Value="this.SelectedAccountId"
@@ -67,12 +67,13 @@ else
                 </div>
             }
         </div>
-        <div class="col-sm-6">
+        <div class="col-lg-8">
             @if (this.Products is not null)
             {
                 <CustomerProductList 
                     AccountProducts="this.AccountProducts"
-                    RemoveAccountProdutCallback="RemoveAccountProdut"/>
+                    RemoveAccountProdutCallback="RemoveAccountProdut"
+                    EditAccountProductCallback="EditAccountProduct"/>
             }
         </div>
     </div>
@@ -205,6 +206,20 @@ else
 
         this.toastService.ShowSuccess(
             message: $"Product '{accountProductDTO.Product.Name}' has been removed from the selected account Successfully.",
+            heading: "Success");
+    }
+
+    private async Task EditAccountProduct(AccountProductDTO accountProductDTO)
+    {
+        await this.accountProductService.UpdateAccountProduct(new AccountProductDTO
+        {
+            AccountId = accountProductDTO.AccountId,
+            ProductId = accountProductDTO.ProductId,
+            Cost = accountProductDTO.Cost,
+        });
+
+        this.toastService.ShowSuccess(
+            message: $"Product '{accountProductDTO.Product.Name}' has been updated Successfully.",
             heading: "Success");
     }
 }

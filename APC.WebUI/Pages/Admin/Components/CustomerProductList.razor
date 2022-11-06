@@ -16,8 +16,26 @@
                 <tr>
                     <td><img src="@accountProduct.Product.ImageUrl" class="icon-xl" /></td>
                     <td>@accountProduct.Product.Name</td>
-                    <td><span>$</span>@accountProduct.Cost</td>
-                    <td><button class="btn btn-primary">Edit</button></td>
+                    <td>
+                        @if (this.EditingProductId == accountProduct.ProductId)
+                        {
+                            <EditForm Model="this" OnValidSubmit="() => UpdateCost(accountProduct)">
+                                <ul class="validation-message">@((MarkupString)CustomErrorMessage)</ul>
+                                <InputText @bind-Value="this.Cost" class="form-control"/>
+                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                <button type="button" @onclick="CancelUpdate" class="btn btn-secondary btn-sm">Cancel</button>
+                            </EditForm>
+                        }
+                        else
+                        {
+                            <span>$</span>@accountProduct.Cost
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => Edit(accountProduct)">
+                            Edit
+                        </button>
+                    </td>
                     <td>
                         <button class="btn btn-danger" @onclick="() => RemoveAccountProduct(accountProduct)">
                             Remove
@@ -36,8 +54,71 @@
     [Parameter]
     public EventCallback<AccountProductDTO> RemoveAccountProdutCallback { get; set; }
 
+    [Parameter]
+    public EventCallback<AccountProductDTO> EditAccountProductCallback { get; set; }
+
+    private int EditingProductId { get; set; }
+
+    private string Cost { get; set; }
+
+    private string CustomErrorMessage { get; set; }
+
+
     private async Task RemoveAccountProduct(AccountProductDTO accountProductDTO)
     {
         await this.RemoveAccountProdutCallback.InvokeAsync(accountProductDTO);
+    }
+
+    private void Edit(AccountProductDTO accountProductDTO)
+    {
+        this.EditingProductId = accountProductDTO.ProductId;
+        this.Cost = accountProductDTO.Cost.ToString();
+    }
+
+    private async Task UpdateCost(AccountProductDTO accountProductDTO)
+    {
+        if (!IsFormValid())
+        {
+            return;
+        }
+
+        decimal cost;
+        decimal.TryParse(this.Cost, out cost);
+        accountProductDTO.Cost = cost;
+
+        await this.EditAccountProductCallback.InvokeAsync(accountProductDTO);
+
+        this.ClearForm();
+    }
+
+    private void ClearForm()
+    {
+        this.EditingProductId = 0;
+        this.Cost = null;
+    }
+
+    private bool IsFormValid()
+    {
+        this.CustomErrorMessage = null;
+        bool isValid = true;
+        if (string.IsNullOrWhiteSpace(this.Cost))
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Cost is required. </li>";
+        }
+
+        decimal cost;
+        if (!decimal.TryParse(this.Cost, out cost))
+        {
+            isValid = false;
+            this.CustomErrorMessage += "<li>Cost must be a number. </li>";
+        }
+
+        return isValid;
+    }
+
+    private void CancelUpdate()
+    {
+        this.ClearForm();
     }
 }

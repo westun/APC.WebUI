@@ -36,6 +36,20 @@ namespace APC.DAL.Repositories
             await dbContext.SaveChangesAsync();
         }
 
+        public async Task Update(AccountProduct accountProduct)
+        {
+            if (accountProduct is null)
+            {
+                throw new ArgumentNullException(nameof(accountProduct));
+            }
+
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            dbContext.AccountProduct.Attach(accountProduct);
+            dbContext.Entry(accountProduct).State = EntityState.Modified;
+            await dbContext.SaveChangesAsync();
+        }
+
         public async Task Remove(AccountProduct accountProduct)
         {
             if (accountProduct is null)
