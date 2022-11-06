@@ -76,6 +76,9 @@ else
 }
 
 @code {
+    [CascadingParameter]
+    public CascadingAppState AppState { get; set; }
+
     private IEnumerable<ProductDTO> Products;
 
     private IEnumerable<ProductCategoryDTO> Categories = new List<ProductCategoryDTO>();
@@ -91,7 +94,7 @@ else
     {
         if (firstRender)
         {
-            this.Products = await productService.GetAllProductsAsync();
+            this.Products = await productService.GetAllProductsByAccountIdAsync(this.AppState.CurrentAccountId);
             this.Categories = await productCategoryService.GetProductCategoriesAsync();
 
             this.CategoryCheckboxVMs = this.Categories.Select(c => new ProductCategoryCheckboxVM
@@ -111,7 +114,7 @@ else
 
     private async Task RunFilters()
     {
-        var productsFromDB = await productService.GetAllProductsAsync();
+        var productsFromDB = await productService.GetAllProductsByAccountIdAsync(this.AppState.CurrentAccountId);
 
         int[] selectedIds = this.CategoryCheckboxVMs
                 .Where(p => p.IsChecked)

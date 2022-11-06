@@ -37,6 +37,40 @@ namespace APC.DAL.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Product>> GetByAccountIdAsync(int accountId)
+        {
+            using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
+
+            var accountProducts = dbContext.AccountProduct.Where(p => p.AccountId == accountId);
+            var apProductIds = accountProducts.Select(ap => ap.ProductId);
+            
+            var account = dbContext.Account
+                .Include(a => a.Companies)
+                .FirstOrDefault(a => a.Id == accountId);
+            var companyIds = account.Companies.Select(c => c.Id).ToList();
+
+            //if the user won't see any products, show them all APC products
+            var companies = dbContext.Company.ToList();
+            if (!apProductIds.Any() && !companyIds.Any())
+            {
+                var apc = companies.FirstOrDefault(c => c.Name == "American Paper Converting");
+                if (apc is not null)
+                {
+                    companyIds.Add(apc.Id);
+                }
+            }
+                
+            return await dbContext.Products
+                .Include(p => p.Category)
+                .Include(p => p.Type)
+                .OrderBy(p => p.Type.Name)
+                .ThenBy(p => p.Name)
+                .Include(p => p.AreasOfApplications)
+                //filter products by products the customer is assigned to or if they are assigned a company(s) show all the companie's products
+                .Where(p => (apProductIds.Contains(p.Id) || companyIds.Contains(p.CompanyId)))
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Product>> SearchAsync(string criteria)
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();

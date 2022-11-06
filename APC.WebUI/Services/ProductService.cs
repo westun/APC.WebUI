@@ -32,6 +32,13 @@ namespace APC.WebUI.Services
             return products.Select(p => this.mapper.Map<ProductDTO>(p));
         }
 
+        public async Task<IEnumerable<ProductDTO>> GetAllProductsByAccountIdAsync(int accountId)
+        {
+            var products = await this.productRepository.GetByAccountIdAsync(accountId);
+
+            return products.Select(p => this.mapper.Map<ProductDTO>(p));
+        }
+
         public async Task<IEnumerable<ProductDTO>> Search(string criteria)
         {
             var products = await this.productRepository.SearchAsync(criteria);
