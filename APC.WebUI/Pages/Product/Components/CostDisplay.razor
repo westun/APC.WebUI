@@ -1,0 +1,18 @@
+﻿@{
+    var cost = this.Product.AccountProduct.FirstOrDefault()?.Cost;
+}
+@if (cost is not null)
+{
+    <span>$</span>
+
+    @cost
+}
+else
+{
+    @: $ N/A
+}
+
+@code {
+    [Parameter]
+    public ProductDTO Product { get; set; }
+}

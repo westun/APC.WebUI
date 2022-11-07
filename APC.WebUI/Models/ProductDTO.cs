@@ -24,5 +24,6 @@ namespace APC.WebUI.Models
         public ProductTypeDTO Type { get; set; }
         public IEnumerable<ProductAttributeValueDTO> ProductAttributesValues { get; set; } = new List<ProductAttributeValueDTO>();
         public IEnumerable<AreasOfApplicationDTO> AreasOfApplications { get; set; } = new List<AreasOfApplicationDTO>();
+        public IEnumerable<AccountProductDTO> AccountProduct { get; set; } = new List<AccountProductDTO>();
     }
 }

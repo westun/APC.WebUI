@@ -32,13 +32,13 @@ else
                 </div>
                 
                 <div class="fs-4 mb-3">
-                    <span class="fw-bold text-dark">$32</span>
-                    <span class="text-decoration-line-through text-muted">$35</span>
+                    <span class="fw-bold text-dark"><CostDisplay Product="this.Product"/></span>
+                    @*<span class="text-decoration-line-through text-muted">$35</span>
                     <span>
                         <small class="fs-6 ms-2 text-danger">
                             26% Off
                         </small>
-                    </span>
+                    </span>*@
                 </div>
                 <div>
                     <div class="input-group input-spinner">
@@ -133,7 +133,7 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        this.Product = await this.productService.GetProductByIdAsync(this.ProductId);
+        this.Product = await this.productService.GetProductByIdAccountIdAsync(this.ProductId, this.AppState.CurrentAccountId);
 
         this.SimilarProductsDTOs =
             await this.similarProductsService.GetSimilarProductsByProductIdAsync(this.ProductId);

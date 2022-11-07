@@ -25,6 +25,19 @@ namespace APC.DAL.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<Product> GetAsync(int productId, int accountId)
+        {
+            using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
+            return await dbContext.Products
+                .Include(p => p.Category)
+                .Include(p => p.Type)
+                .Include(p => p.ProductAttributesValues)
+                .ThenInclude(pav => pav.ProductAttribute)
+                .Include(p => p.AreasOfApplications)
+                .Include(p => p.AccountProduct.Where(ap => ap.AccountId == accountId))
+                .FirstOrDefaultAsync(p => p.Id == productId);
+        }
+
         public async Task<IEnumerable<Product>> GetAsync()
         {
             using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
@@ -66,6 +79,7 @@ namespace APC.DAL.Repositories
                 .OrderBy(p => p.Type.Name)
                 .ThenBy(p => p.Name)
                 .Include(p => p.AreasOfApplications)
+                .Include(p => p.AccountProduct.Where(ap => ap.AccountId == accountId))
                 //filter products by products the customer is assigned to or if they are assigned a company(s) show all the companie's products
                 .Where(p => (apProductIds.Contains(p.Id) || companyIds.Contains(p.CompanyId)))
                 .ToListAsync();

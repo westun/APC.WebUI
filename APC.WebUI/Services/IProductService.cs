@@ -5,6 +5,7 @@ namespace APC.WebUI.Services
     public interface IProductService
     {
         Task<ProductDTO> GetProductByIdAsync(int id);
+        Task<ProductDTO> GetProductByIdAccountIdAsync(int productId, int accountId);
         Task<IEnumerable<ProductDTO>> GetAllProductsAsync();
         Task<IEnumerable<ProductDTO>> GetAllProductsByAccountIdAsync(int accountId);
         Task<IEnumerable<ProductDTO>> Search(string criteria);
