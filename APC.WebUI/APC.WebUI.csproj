@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="APC.DAL" Version="1.0.6" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.14.0" />
     <PackageReference Include="Blazored.Modal" Version="7.1.0" />
@@ -25,10 +26,6 @@
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.16.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.20" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\APC.DAL\APC.DAL.csproj" />
   </ItemGroup>
 
 </Project>
