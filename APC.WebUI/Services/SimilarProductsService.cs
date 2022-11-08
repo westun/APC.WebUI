@@ -2,6 +2,7 @@
 using APC.DAL.Repositories;
 using APC.WebUI.Models;
 using AutoMapper;
+using System.Collections.Generic;
 
 namespace APC.WebUI.Services
 {
@@ -22,13 +23,7 @@ namespace APC.WebUI.Services
         {
             var similarProducts = await this.similarProductsRepository.GetAsync(productId);
 
-            return similarProducts.Select(c => new SimilarProductsDTO
-            {
-                TheProductid = c.TheProductid,
-                SimiliarProduct = c.SimilarProduct,
-                SimilarProductId = c.SimilarProductId,
-                TheProduct = c.TheProduct,
-            });
+            return this.mapper.Map<IEnumerable<SimilarProductsDTO>>(similarProducts);
         }
 
         public async Task SaveAsync(SimilarProductsDTO similarProductsDTO)

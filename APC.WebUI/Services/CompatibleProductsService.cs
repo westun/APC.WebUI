@@ -22,14 +22,6 @@ namespace APC.WebUI.Services
             var compatibleProducts = await this.compatibleProductsRepository.GetAsync(productId);
 
             return this.mapper.Map<IEnumerable<CompatibleProductsDTO>>(compatibleProducts);
-
-            //return similarProducts.Select(c => new SimilarProductsDTO
-            //{
-            //    TheProductid = c.TheProductid,
-            //    SimiliarProduct = c.CompatibleProduct,
-            //    SimilarProductId = c.SimilarProductId,
-            //    TheProduct = c.TheProduct,
-            //});
         }
 
         public async Task SaveAsync(CompatibleProductsDTO compatibleProductsDTO)

@@ -125,7 +125,7 @@ else
         await this.similarProductsService.DeleteAsync(similarProductsDTO);
 
         this.toastService.ShowSuccess(
-            message: $"The Similar Product ({similarProductsDTO.SimiliarProduct.Name}) has been Removed Successfully.",
+            message: $"The Similar Product ({similarProductsDTO.SimilarProduct.Name}) has been Removed Successfully.",
             heading: "Success");
 
         this.SimilarProductsDTO =

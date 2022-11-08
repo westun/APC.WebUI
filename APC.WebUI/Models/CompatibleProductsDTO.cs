@@ -1,6 +1,4 @@
-﻿using APC.DAL.Models;
-
-namespace APC.WebUI.Models
+﻿namespace APC.WebUI.Models
 {
     public class CompatibleProductsDTO
     {
@@ -8,7 +6,7 @@ namespace APC.WebUI.Models
         public int TheProductid { get; set; }
         public int CompatibleProductId { get; set; }
 
-        public Product TheProduct { get; set; }
-        public Product CompatibleProduct { get; set; }
+        public ProductDTO TheProduct { get; set; }
+        public ProductDTO CompatibleProduct { get; set; }
     }
 }
