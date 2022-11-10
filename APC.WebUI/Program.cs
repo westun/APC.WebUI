@@ -1,6 +1,7 @@
 using APC.DAL.DataAccess;
 using APC.WebUI.Authentication.EventHandlers;
 using APC.WebUI.Configuration;
+using APC.WebUI.ViewModels;
 using Blazored.Modal;
 using Blazored.Toast;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -76,6 +77,7 @@ namespace APC.WebUI
             builder.Services.AddDalServices();
             
             builder.Services.AddTransient<IOnTicketReceived, OnTicketReceived>();
+            builder.Services.AddTransient<ITypesViewModel, TypesViewModel>();
 
             var app = builder.Build();
 

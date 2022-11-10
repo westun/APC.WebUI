@@ -3,8 +3,9 @@
 @inject IProductTypeService productTypeService
 @inject IProductCategoryService productCategoryService
 @inject IToastService toastService
+@inject ITypesViewModel typesViewModel
 
-@if (productTypeDTOs is null)
+@if (typesViewModel.ProductTypeDTOs is null)
 {
     <Spinner />
 }
@@ -13,23 +14,23 @@ else
     <div class="row">
         <div class="col-sm-6 mb-3">
             <h2>Add New Type</h2>
-            <EditForm Model="productTypeDTO" OnValidSubmit="SaveProductType">
+            <EditForm Model="typesViewModel.ProductTypeDTO" OnValidSubmit="typesViewModel.SaveProductType">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 @*Custom error message for select controls that don't validate properly*@
-                <ul class="validation-message">@((MarkupString)CustomErrorMessage)</ul>
+                <ul class="validation-message">@((MarkupString)typesViewModel.CustomErrorMessage)</ul>
                 <div class="mb-2">
                     <label class="form-label">Name</label>
                     <div class="col-lg-6 col-md-10 col-sm-12">
-                        <InputText @bind-Value="productTypeDTO.Name" class="form-control"></InputText>
+                        <InputText @bind-Value="typesViewModel.ProductTypeDTO.Name" class="form-control"></InputText>
                     </div>
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Category</label>
                     <div class="col-lg-6 col-md-10 col-sm-12">
-                        <InputSelect @bind-Value="productTypeDTO.CategoryId" class="form-select">
+                        <InputSelect @bind-Value="typesViewModel.ProductTypeDTO.CategoryId" class="form-select">
                             <option></option>
-                            @foreach (var category in productCategoryDTOs)
+                            @foreach (var category in typesViewModel.ProductCategoryDTOs)
                             {
                                 <option value="@category.Id">@category.Name</option>
                             }
@@ -37,7 +38,7 @@ else
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary me-3">Save</button>
-                @if (this.SaveInProgress)
+                @if (this.typesViewModel.SaveInProgress)
                 {
                     <span class="spinner-border text-success align-middle"></span>
                 }
@@ -50,7 +51,7 @@ else
         <div class="col-sm-6">
             <h2>Current Types</h2>
             <div>
-                @foreach (var productType in productTypeDTOs)
+                @foreach (var productType in typesViewModel.ProductTypeDTOs)
                 {
                     <p>
                         <span class="oi oi-circle-check text-success"></span>
@@ -63,59 +64,10 @@ else
 }
 
 @code {
-    private IEnumerable<ProductTypeDTO> productTypeDTOs { get; set; }
-    private ProductTypeDTO productTypeDTO { get; set; } = new();
-    private IEnumerable<ProductCategoryDTO> productCategoryDTOs { get; set; }
-
-    private bool SaveInProgress { get; set; }
-    private string CustomErrorMessage { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        this.productTypeDTOs = (await this.productTypeService.GetProductTypesAsync())
-            .OrderBy(t => t.Name);
-        this.productCategoryDTOs = await this.productCategoryService.GetProductCategoriesAsync();
-    }
-
-    private async Task SaveProductType(EditContext editContext)
-    {
-        if (!FormIsValid())
-        {
-            return;
-        }
-
-        this.SaveInProgress = true;
-
-        await this.productTypeService.SaveProductTypeAsync(this.productTypeDTO);
-
-        this.productTypeDTOs = await this.productTypeService.GetProductTypesAsync();
-
-        this.toastService.ShowSuccess(
-            message: $"Type ({this.productTypeDTO.Name}) has been Saved Successfully.",
-            heading: "Success");
+        this.typesViewModel.StateChanged += () => this.StateHasChanged();
 
         await Task.CompletedTask;
-
-        this.ClearForm();
-
-        this.SaveInProgress = false;
-    }
-
-    private bool FormIsValid()
-    {
-        this.CustomErrorMessage = null;
-
-        if (this.productTypeDTO.CategoryId <= 0)
-        {
-            this.CustomErrorMessage += "<li>Category is required.</li>";
-            return false;
-        }
-
-        return true;
-    }
-
-    private void ClearForm()
-    {
-        this.productTypeDTO = new();
     }
 }
