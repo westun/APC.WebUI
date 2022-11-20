@@ -25,9 +25,16 @@ else
                     <ul class="validation-message">@((MarkupString)CustomErrorMessage)</ul>
                     @foreach (var pav in this.productAttributeValueDTOs)
                     {
-                        <div class="mb-2">
-                            <label class="form-label">@pav.ProductAttribute.Name</label>
-                            <InputText @bind-Value="pav.Value" class="form-control"/>
+                        <div class="row">
+                            <div class="col-auto mb-2">
+                                <label class="form-label">@pav.ProductAttribute.Name</label>
+                                <InputText @bind-Value="pav.Value" class="col-auto form-control"/>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-danger mt-7" @onclick="() => Remove(pav)">
+                                    Remove
+                                </button>
+                            </div>
                         </div>
                     }
                     <div class="mt-2 mb-5">
@@ -105,6 +112,8 @@ else
             message: $"The Product Attributes have been Saved Successfully.",
             heading: "Success");
 
+        await this.LoadProductAttributeValues();
+
         this.SaveInProgress = false;
     }
 
@@ -114,6 +123,20 @@ else
         {
             ProductAttribute = productAttribute,
         });
+    }
+
+    private async Task Remove(ProductAttributeValueDTO productAttributeDTO)
+    {
+        var pav = new ProductAttributeValueDTO
+        {
+            Id = productAttributeDTO.Id,
+            Value = productAttributeDTO.Value,
+        };
+
+        await this.productAttributeValueService
+            .RemoveProductAttributeValueAsync(pav);
+
+        await this.LoadProductAttributeValues();
     }
 
     private bool FormIsValid()
@@ -130,5 +153,11 @@ else
         }
 
         return true;
+    }
+
+    private async Task LoadProductAttributeValues()
+    {
+        this.product = await this.productService.GetProductByIdAsync(this.ProductId);
+        this.productAttributeValueDTOs = this.product.ProductAttributesValues.ToList();
     }
 }

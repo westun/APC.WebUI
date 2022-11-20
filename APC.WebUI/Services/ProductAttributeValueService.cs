@@ -24,5 +24,12 @@ namespace APC.WebUI.Services
 
             await this.productAttributeValueRepository.SaveAsync(productId, pav);
         }
+
+        public async Task RemoveProductAttributeValueAsync(ProductAttributeValueDTO productAttributeValueDTO)
+        {
+            var productAttributeValue = this.mapper.Map<ProductAttributeValue>(productAttributeValueDTO);
+
+            await this.productAttributeValueRepository.RemoveAsync(productAttributeValue);
+        }
     }
 }
