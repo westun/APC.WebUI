@@ -25,11 +25,30 @@ namespace APC.WebUI.Services
             return this.mapper.Map<AccountDTO>(account);
         }
 
+        public async Task<AccountDTO> GetAccountAsync(int accountId)
+        {
+            var account = await this.accountRepository.GetAsync(accountId);
+
+            return this.mapper.Map<AccountDTO>(account);
+        }
+
         public async Task<IEnumerable<AccountDTO>> GetAccountsAsync()
         {
             var accounts = await this.accountRepository.GetAsync();
 
             return this.mapper.Map<IEnumerable<AccountDTO>>(accounts);
+        }
+
+        public async Task SaveAccount(AccountDTO accountDTO)
+        {
+            if (accountDTO.Id <= 0)
+            {
+                throw new Exception("account id is required");
+            }
+
+            var account = this.mapper.Map<Account>(accountDTO);
+
+            await this.accountRepository.SaveAccount(account);
         }
 
         public async Task SaveCompaniesToAccountAsync(

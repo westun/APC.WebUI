@@ -21,6 +21,14 @@ namespace APC.DAL.Repositories
                 .FirstOrDefault(c => c.ObjectIdentifier == OID);
         }
 
+        public async Task<Account> GetAsync(int accountId)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            return dbContext.Account
+                .FirstOrDefault(a => a.Id == accountId);
+        }
+
         public async Task<IEnumerable<Account>> GetAsync()
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
@@ -28,6 +36,13 @@ namespace APC.DAL.Repositories
             return dbContext.Account
                 .Include(a => a.Companies)
                 .ToList();
+        }
+
+        public async Task SaveAccount(Account account)
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            //TODO: save account to DB
         }
 
         public async Task SaveCompaniesAsync(int accountId, IEnumerable<Company> companies)
