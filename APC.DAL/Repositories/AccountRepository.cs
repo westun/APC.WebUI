@@ -40,9 +40,21 @@ namespace APC.DAL.Repositories
 
         public async Task SaveAccount(Account account)
         {
+            if (account is null)
+            {
+                throw new ArgumentNullException(nameof(account));
+            }
+
+            if (account.Id <= 0)
+            {
+                throw new Exception("account id is required");
+            }
+
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
-            //TODO: save account to DB
+            dbContext.Account.Attach(account);
+            dbContext.Entry(account).State = EntityState.Modified;
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task SaveCompaniesAsync(int accountId, IEnumerable<Company> companies)

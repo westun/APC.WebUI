@@ -1,7 +1,8 @@
 ﻿@page "/profile"
 @inject IAccountService accountService
+@inject IToastService toastService
 
-@if (Account is null)
+@if (Account is null || this.SaveInProgress)
 {
     <Spinner/>
 }
@@ -21,12 +22,17 @@ else
                 </div>
 
                 <div class="mb-3">
-                    <label for="lastname" class="form-label">First Name</label>
+                    <label for="lastname" class="form-label">Last Name</label>
                     <InputText @bind-Value="Account.LastName" id="lastname" class="form-control" />
                 </div>
 
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="displayname" class="form-label">Display Name</label>
+                    <InputText @bind-Value="Account.DisplayName" id="displayname" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email <em>(Where emails are sent, not your log in email)</em></label>
                     <InputText @bind-Value="Account.Email" id="email" class="form-control" />
                 </div>
 
@@ -44,6 +50,8 @@ else
 
     private AccountDTO Account { get; set; }
 
+    public bool SaveInProgress { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         this.Account = await accountService.GetAccountAsync(AppState.CurrentAccountId);
@@ -51,6 +59,16 @@ else
 
     private async Task SaveAccount()
     {
+        this.SaveInProgress = true;
+
         await this.accountService.SaveAccount(this.Account);
+
+        this.toastService.ShowSuccess(
+            message: $"Your profile information has been saved successfully.",
+            heading: "Success");
+
+        this.SaveInProgress = false;
     }
 }
+
+
